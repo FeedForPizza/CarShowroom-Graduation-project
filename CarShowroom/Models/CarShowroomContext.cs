@@ -23,6 +23,7 @@ public partial class CarShowroomContext : DbContext
     public virtual DbSet<Extra> Extras { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
+    public virtual DbSet<OrderExtra> OrderExtras { get; set; }
 
     public virtual DbSet<Storage> Storages { get; set; }
 
@@ -143,6 +144,27 @@ public partial class CarShowroomContext : DbContext
                 .HasForeignKey(d => d.CustomerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Order_Customer");
+        });
+        modelBuilder.Entity<OrderExtra>(entity =>
+        {
+            entity.HasKey(e => e.OrderExtraId)
+                .HasName("PK_ORDEREXTRA")
+                .IsClustered(false);
+            entity
+                .ToTable("OrderExtra", "19118133");
+
+            entity.Property(e => e.OrderId).HasColumnName("OrderID");
+            entity.Property(e => e.ExtraId).HasColumnName("ExtraID");
+
+            entity.HasOne(d => d.Order).WithMany()
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrderExtra_Order");
+
+            entity.HasOne(d => d.Extra).WithMany()
+                .HasForeignKey(d => d.ExtraId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CarExtra_Extra");
         });
 
         modelBuilder.Entity<Storage>(entity =>

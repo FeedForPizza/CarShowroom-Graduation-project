@@ -1,7 +1,10 @@
 ﻿using CarShowroom.Data;
 using CarShowroom.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CarShowroom.Controllers
 {
@@ -72,24 +75,46 @@ namespace CarShowroom.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            var extra = carShowroomContext.Extras.ToList();
-            var viewModel = new Extra
+            var extras = carShowroomContext.Extras.ToList();
+            var options = new StringBuilder();
+            foreach (var extra in extras)
             {
-                ExtraName = 
-            };
-            return View("Create",extra);
+                options.AppendFormat("<label><input type=\"checkbox\" name=\"extraId\" value=\"{0}\" /> {1}</label><br/>", extra.ExtraId, extra.ExtraName);
+            }
+            ViewBag.ExtrasOptions = options.ToString();
+            return View("Create");
         }
         [HttpPost]
-        public async Task<IActionResult> CreateProcess(Order order)
+        public async Task<IActionResult> CreateProcess(Order order,OrderExtra orderExtra,Extra extra,Customer customer)
         {
+            var oe = new OrderExtra
+            {
+                OrderId = order.OrderId,
+                ExtraId = extra.ExtraId
+            };
+            await carShowroomContext.OrderExtras.AddAsync(oe);
+            await carShowroomContext.SaveChangesAsync();
+            var cust = new Customer()
+            {
+
+                FirstName = customer.FirstName,
+                MiddleName = customer.MiddleName,
+                LastName = customer.LastName,
+                Address = customer.Address,
+                Phone = customer.Phone
+            };
+            await carShowroomContext.Customers.AddAsync(cust);
+            await carShowroomContext.SaveChangesAsync();
+            int custId = cust.CustomerId;
             var orders = new Order
             {
                 OrderId = order.OrderId,
                 OriginalPice = order.OriginalPice,
                 TotalSum = order.TotalSum,
                 CarId = order.CarId,
-                CustomerId = order.CustomerId
+                CustomerId = custId
             };
+            
             await carShowroomContext.Orders.AddAsync(orders);
             await carShowroomContext.SaveChangesAsync();
             ViewBag.Message = "Order made successfully!";

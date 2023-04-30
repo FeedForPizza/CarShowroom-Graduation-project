@@ -11,6 +11,7 @@ namespace CarShowroom.Services.DTO.CarExtra
 {
     public class CarExtraDTO
     {
+        public int CarExtraId { get; set; } 
         public int CarId { get; set; }
 
         public int ExtraId { get; set; }
