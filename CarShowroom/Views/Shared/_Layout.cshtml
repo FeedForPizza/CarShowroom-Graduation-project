@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - CarShowroom</title>
+	@*<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />*@
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.css"
+		  rel="stylesheet" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/CarShowroom.styles.css" asp-append-version="true" />
+	<style>
+		
+
+		.btn {
+			background-color: transparent;
+			color: white;
+			font-size: 15px;
+			cursor: pointer;
+			border-radius: 30PX;
+		}
+	</style>
+</head>
+<body>
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-lg navbar-dark shadow-5-strong">
+		<!-- Container wrapper -->
+		<div class="container">
+			<!-- Navbar brand -->
+			<a class="navbar-brand" href="#">NISSAN</a>
+
+			<!-- Toggle button -->
+			<button class="navbar-toggler"
+					type="button"
+					data-mdb-toggle="collapse"
+					data-mdb-target="#navbarSupportedContent"
+					aria-controls="navbarSupportedContent"
+					aria-expanded="false"
+					aria-label="Toggle navigation">
+				<i class="fas fa-bars"></i>
+			</button>
+
+			<!-- Collapsible wrapper -->
+			<div class="collapse navbar-collapse" id="navbarSupportedContent" style="align-items:center">
+				<!-- Left links -->
+				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+					<li class="nav-item">
+						<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Car" asp-action="Index">КОЛИ</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="TestDrive" asp-action="Create">ТЕСТ ДРАЙВ</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Orders" asp-action="Create">ПОРЪЧКА</a>
+					</li>
+
+				</ul>
+				<div class="d-flex ms-auto order-5">
+					<input type="button" class="btn" value="Login">
+					<input type="button" class="btn" value="Register">
+				</div>
+				<!-- Left links -->
+			</div>
+			<!-- Collapsible wrapper -->
+		</div>
+		<!-- Container wrapper -->
+	</nav>
+	<!-- Navbar -->
+	<div class="container">
+		<main role="main" class="pb-3">
+			@RenderBody()
+		</main>
+	</div>
+
+	<footer class="border-top footer text-muted">
+		<div class="container">
+			&copy; 2023 - CarShowroom - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+		</div>
+	</footer>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
