@@ -18,45 +18,37 @@
 	<h1>Create</h1>
 
 	<h4>Order</h4>
-	<hr />
+	<hr /><form asp-action="CreateProcess" method="post">
 	<div class="row">
 		<div class="column">
+			
 			<div class="col-md-4">
-				<form asp-action="Create">
+				
 					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					
 					<div class="form-group">
-						<label asp-for="OrderId" class="control-label"></label>
-						<input asp-for="OrderId" class="form-control" />
-						<span asp-validation-for="OrderId" class="text-danger"></span>
-					</div>
-					<div class="form-group">
-						<label asp-for="OriginalPice" class="control-label"></label>
-						<input asp-for="OriginalPice" class="form-control" />
+                <label asp-for="CarId" class="control-label">Модел кола:</label>
+                  @Html.DropDownListFor(x => x.CarId, new SelectList(ViewBag.CustomerOptions, "CarId", "Model"))
+                    
+                    <br/>
+<div class="form-group">
+						<label asp-for="OriginalPice" class="control-label"><span id="original-price"></span></label>
 						<span asp-validation-for="OriginalPice" class="text-danger"></span>
 					</div>
+					
 					<div class="form-group">
-						<label asp-for="TotalSum" class="control-label"></label>
-						<input asp-for="TotalSum" class="form-control" />
-						<span asp-validation-for="TotalSum" class="text-danger"></span>
-					</div>
-					<div class="form-group">
-						<label asp-for="Quantity" class="control-label"></label>
-						<input asp-for="Quantity" class="form-control" />
+						<label asp-for="Quantity" class="control-label">Количество</label>
+						<input asp-for="Quantity" class="form-control" id="quantity-input"/>
 						<span asp-validation-for="Quantity" class="text-danger"></span>
 					</div>
-					<div class="form-group">
-						<label asp-for="CarId" class="control-label"></label>
-						<select asp-for="CarId" class="form-control" asp-items="ViewBag.CarId"></select>
-					</div>
-					<div class="form-group">
-						<label asp-for="CustomerId" class="control-label"></label>
-						<select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
-					</div>
-				</form>
+					
+            </div>
+					
+				
 			</div>
 		</div>
 		<div class="column">
-			<form>
+			
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Customer.FirstName" class="control-label"></label>
@@ -83,23 +75,31 @@
                 <input asp-for="Customer.Phone" class="form-control" />
                 <span asp-validation-for="Customer.Phone" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+            
+        
 		</div>
 		<div class="column">
-<form action="@Url.Action("AddExtra", "Order")" method="post">
+
     <fieldset>
         <legend>Select Extra:</legend>
-        <select name="extraId">
-            @Html.Raw(ViewBag.ExtrasOptions)
-        </select>
-    </fieldset>
+		@{ var e = 0;}
+        @foreach(var extra in ViewBag.ExtrasOptions){
 
-</form>
+			<label><input type="checkbox" name="extras[@e].IsChecked" value="true" />@extra.ExtraName</label><br/>
+			<input type="hidden" name="extras[@(e++)].ExtraId" value="@extra.ExtraId"/>
+		}
+    </fieldset>
+    <div class="form-group">
+						<input type="hidden" asp-for="TotalSum" id="total-sum-input" />
+                        <label>Total sum: <span id="total-sum"></span></label>
+					</div>
+    
+<div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
 		</div>
 	</div>
+</form>
 	<div>
 		<a asp-action="Index">Back to List</a>
 	</div>
@@ -109,3 +109,59 @@
 	await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
 }
+<script>
+    function calculatePrice() {
+        var carId = $('#car-select').val();
+        var quantity = $('#quantity-input').val();
+        
+        $('input[name^=extras]:checked').each(function() {
+            var extraId = $(this).attr('name').match(/\d+/)[0];
+            extras.push({ ExtraId: extraId, IsChecked: true });
+        });
+        $.ajax({
+            url: '/Order/CalculatePrice',
+            type: 'POST',
+            data: { carId: carId, quantity: quantity, extras: extras },
+            success: function(data, status, jqXHR) {
+                var price = data.price;
+                $('#total-price').text('Total price: ' + price);
+                $('#total-sum-input').val(price);
+                var totalSum = parseInt(price.match(/\d+/)[0]);
+                $('#total-sum').text(totalSum);
+
+            },
+            error: function(jqXHR, status, error) {
+                $('#total-price').text('Error calculating price');
+            }
+        });
+    });
+});
+
+function updateOriginalPrice() {
+    var selectedCarId = $("#car-dropdown").val();
+    $.ajax({
+        url: "/Order/GetCarPrice",
+        type: "GET",
+        data: {
+            carId: selectedCarId
+        },
+        success: function(data, status, jqXHR) {
+            var originalPrice = data.price;
+            $("#original-price").text("Original price: $" + originalPrice);
+        },
+        error: function(jqXHR, status, error) {
+            console.error(error);
+        }
+    });
+}
+$(document).ready(function() {
+    // Call updateOriginalPrice when the page loads
+    updateOriginalPrice();
+
+    // Call updateOriginalPrice whenever the car selection changes
+    $("#car-dropdown").on("change", function() {
+        updateOriginalPrice();
+    });
+
+});
+</script>

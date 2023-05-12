@@ -1,5 +1,6 @@
 ﻿using CarShowroom.Data;
 using CarShowroom.Entities;
+using CarShowroom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,20 +21,22 @@ namespace CarShowroom.Controllers
         public IActionResult Index()
         {
             var orders = carShowroomContext.Orders.ToList();
-            return View("Index",orders);
+            return View("Index", orders);
         }
         [HttpGet]
         public ActionResult Details(int id)
         {
             var order = carShowroomContext.Orders.FirstOrDefault(x => x.OrderId == id);
-            return View("Details",order);
+            return View("Details", order);
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, int custid)
         {
             var order = await carShowroomContext.Orders.FirstOrDefaultAsync(x => x.OrderId == id);
+            var custoomer = await carShowroomContext.Customers.FirstOrDefaultAsync(y => y.CustomerId == custid);
             if (order != null)
             {
+
                 var orders = new Order()
                 {
                     OrderId = order.OrderId,
@@ -41,10 +44,11 @@ namespace CarShowroom.Controllers
                     TotalSum = order.TotalSum,
                     Quantity = order.Quantity,
                     CarId = order.CarId,
-                    CustomerId = order.CustomerId
+
                 };
+
             }
-                return View("Edit",order);
+            return View("Edit", order);
         }
         public async Task<IActionResult> Edit(Order order)
         {
@@ -76,23 +80,42 @@ namespace CarShowroom.Controllers
         public ActionResult Create()
         {
             var extras = carShowroomContext.Extras.ToList();
-            var options = new StringBuilder();
-            foreach (var extra in extras)
-            {
-                options.AppendFormat("<label><input type=\"checkbox\" name=\"extraId\" value=\"{0}\" /> {1}</label><br/>", extra.ExtraId, extra.ExtraName);
-            }
-            ViewBag.ExtrasOptions = options.ToString();
+            ViewBag.ExtrasOptions = extras.Select(x => new ExtraViewModel() { ExtraId = x.ExtraId, IsChecked = false, ExtraName = x.ExtraName });
+            var cars = carShowroomContext.Cars.ToList();
+            ViewBag.CustomerOptions = cars;
             return View("Create");
         }
         [HttpPost]
-        public async Task<IActionResult> CreateProcess(Order order,OrderExtra orderExtra,Extra extra,Customer customer)
+        public IActionResult CalculatedPrice(int carId, int quantity, List<ExtraViewModel> extra)
         {
-            var oe = new OrderExtra
+            var car = carShowroomContext.Cars.SingleOrDefault(c => c.CarId == carId);
+            if (car == null)
             {
-                OrderId = order.OrderId,
-                ExtraId = extra.ExtraId
-            };
-            await carShowroomContext.OrderExtras.AddAsync(oe);
+                throw new ArgumentException("Invalid car ID");
+            }
+            var selectedExtras = extra.Where(e => e.IsChecked).ToList();
+            var extraPrice = selectedExtras.Sum(e => carShowroomContext.Extras.Single(x => x.ExtraId == e.ExtraId)?.Price ?? 0);
+            // Calculate the price based on the selected car and quantity
+            var price = car.OriginalPrice * quantity + extraPrice;
+            
+
+            return Json(price);
+        }
+        [HttpGet]
+        public IActionResult GetCarPrice(int carId)
+        {
+            var car = carShowroomContext.Cars.SingleOrDefault(c => c.CarId == carId);
+            if (car == null)
+            {
+                throw new ArgumentException("Invalid car ID");
+            }
+
+            return Json(new { price = car.OriginalPrice });
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateProcess(Order order, List<ExtraViewModel> extras, Customer customer)
+        {
+
             await carShowroomContext.SaveChangesAsync();
             var cust = new Customer()
             {
@@ -108,14 +131,23 @@ namespace CarShowroom.Controllers
             int custId = cust.CustomerId;
             var orders = new Order
             {
-                OrderId = order.OrderId,
+                
                 OriginalPice = order.OriginalPice,
                 TotalSum = order.TotalSum,
                 CarId = order.CarId,
                 CustomerId = custId
             };
-            
             await carShowroomContext.Orders.AddAsync(orders);
+            await carShowroomContext.SaveChangesAsync();
+            foreach (var extra in extras.Where(x => x.IsChecked))
+            {
+                var oe = new OrderExtra
+                {
+                    OrderId = orders.OrderId,
+                    ExtraId = extra.ExtraId
+                };
+                await carShowroomContext.OrderExtras.AddAsync(oe);
+            }
             await carShowroomContext.SaveChangesAsync();
             ViewBag.Message = "Order made successfully!";
             return View("Details");

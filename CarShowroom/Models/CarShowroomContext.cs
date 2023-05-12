@@ -129,7 +129,6 @@ public partial class CarShowroomContext : DbContext
             entity.ToTable("Order", "19118133");
 
             entity.Property(e => e.OrderId)
-                .ValueGeneratedNever()
                 .HasColumnName("OrderID");
             entity.Property(e => e.CarId).HasColumnName("CarID");
             entity.Property(e => e.CustomerId).HasColumnName("CustomerID");

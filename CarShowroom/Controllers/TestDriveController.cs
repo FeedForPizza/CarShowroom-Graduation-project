@@ -97,12 +97,7 @@ namespace CarShowroom.Controllers
         public ActionResult Create()
         {
             var cars = carShowroomContext.Cars.ToList();
-            var options = new StringBuilder();
-            foreach (var car in cars)
-            {
-                options.AppendFormat("<option value=\"{0}\">{1}</option>", car.CarId,car.Model);
-            }
-            ViewBag.CustomerOptions = options.ToString();
+            ViewBag.CustomerOptions = cars;
             return View("Create");
         }
         [HttpPost]
