@@ -7,7 +7,7 @@ public partial class Order
 {
     public int OrderId { get; set; }
 
-    public decimal? OriginalPice { get; set; }
+    public decimal? OriginalPrice { get; set; }
 
     public decimal? TotalSum { get; set; }
 

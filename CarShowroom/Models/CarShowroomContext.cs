@@ -132,7 +132,7 @@ public partial class CarShowroomContext : DbContext
                 .HasColumnName("OrderID");
             entity.Property(e => e.CarId).HasColumnName("CarID");
             entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
-            entity.Property(e => e.OriginalPice).HasColumnType("money");
+            entity.Property(e => e.OriginalPrice).HasColumnType("money");
             entity.Property(e => e.TotalSum).HasColumnType("money");
 
             entity.HasOne(d => d.Car).WithMany(p => p.Orders)

@@ -40,7 +40,7 @@ namespace CarShowroom.Controllers
                 var orders = new Order()
                 {
                     OrderId = order.OrderId,
-                    OriginalPice = order.OriginalPice,
+                    OriginalPrice = order.OriginalPrice,
                     TotalSum = order.TotalSum,
                     Quantity = order.Quantity,
                     CarId = order.CarId,
@@ -56,7 +56,7 @@ namespace CarShowroom.Controllers
             if (orders != null)
             {
                 orders.OrderId = order.OrderId;
-                orders.OriginalPice = order.OriginalPice;
+                orders.OriginalPrice = order.OriginalPrice;
                 orders.TotalSum = order.TotalSum;
                 orders.Quantity = order.Quantity;
                 orders.CarId = order.CarId;
@@ -82,24 +82,36 @@ namespace CarShowroom.Controllers
             var extras = carShowroomContext.Extras.ToList();
             ViewBag.ExtrasOptions = extras.Select(x => new ExtraViewModel() { ExtraId = x.ExtraId, IsChecked = false, ExtraName = x.ExtraName });
             var cars = carShowroomContext.Cars.ToList();
-            ViewBag.CustomerOptions = cars;
+            ViewBag.CustomerOptions = new SelectList(cars,"CarId","Model");
             return View("Create");
         }
         [HttpPost]
-        public IActionResult CalculatedPrice(int carId, int quantity, List<ExtraViewModel> extra)
+        public IActionResult CalculatePrice(int carId, int quantity, List<ExtraViewModel> extra)
         {
             var car = carShowroomContext.Cars.SingleOrDefault(c => c.CarId == carId);
             if (car == null)
             {
-                throw new ArgumentException("Invalid car ID");
+                return Json(new { errorMessage = "Invalid car ID" });
             }
             var selectedExtras = extra.Where(e => e.IsChecked).ToList();
-            var extraPrice = selectedExtras.Sum(e => carShowroomContext.Extras.Single(x => x.ExtraId == e.ExtraId)?.Price ?? 0);
+            decimal extraPrice = 0;
+            foreach(var e in selectedExtras)
+            {
+                if (e.IsChecked)
+                {
+                    var extraInDb = carShowroomContext.Extras.FirstOrDefault(x => x.ExtraId == e.ExtraId);
+                    if (extraInDb != null)
+                    {
+                        extraPrice += extraInDb.Price ?? 0;
+                    }
+                }
+            }
             // Calculate the price based on the selected car and quantity
+
             var price = car.OriginalPrice * quantity + extraPrice;
             
 
-            return Json(price);
+            return Json(new { price });
         }
         [HttpGet]
         public IActionResult GetCarPrice(int carId)
@@ -107,10 +119,10 @@ namespace CarShowroom.Controllers
             var car = carShowroomContext.Cars.SingleOrDefault(c => c.CarId == carId);
             if (car == null)
             {
-                throw new ArgumentException("Invalid car ID");
+                return Json(new { errorMessage = "Invalid car ID" });
             }
 
-            return Json(new { price = car.OriginalPrice });
+            return Json(new { ogPrice = car.OriginalPrice });
         }
         [HttpPost]
         public async Task<IActionResult> CreateProcess(Order order, List<ExtraViewModel> extras, Customer customer)
@@ -132,7 +144,7 @@ namespace CarShowroom.Controllers
             var orders = new Order
             {
                 
-                OriginalPice = order.OriginalPice,
+                OriginalPrice = order.OriginalPrice,
                 TotalSum = order.TotalSum,
                 CarId = order.CarId,
                 CustomerId = custId

@@ -18,88 +18,103 @@
 	<h1>Create</h1>
 
 	<h4>Order</h4>
-	<hr /><form asp-action="CreateProcess" method="post">
-	<div class="row">
-		<div class="column">
-			
-			<div class="col-md-4">
-				
+	<hr />
+	<form asp-action="CreateProcess" method="post">
+		<div class="row">
+			<div class="column">
+
+				<div class="col-md-4">
+
 					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-					
+
 					<div class="form-group">
-                <label asp-for="CarId" class="control-label">Модел кола:</label>
-                  @Html.DropDownListFor(x => x.CarId, new SelectList(ViewBag.CustomerOptions, "CarId", "Model"))
-                    
-                    <br/>
-<div class="form-group">
-						<label asp-for="OriginalPice" class="control-label"><span id="original-price"></span></label>
-						<span asp-validation-for="OriginalPice" class="text-danger"></span>
+						
+							@Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Select Model", new{@class = "form-control", id = "Car"})
+						
+						<div class="form-group">
+
+							<span id="original-price"></span>
+							<span asp-validation-for="OriginalPrice" class="text-danger"></span>
+						</div>
+
+						<div class="form-group">
+							<label asp-for="Quantity" class="control-label">Количество</label>
+							<input asp-for="Quantity" class="form-control" id="quantity-input" />
+							<span asp-validation-for="Quantity" class="text-danger"></span>
+						</div>
+
+
+
+
 					</div>
-					
-					<div class="form-group">
-						<label asp-for="Quantity" class="control-label">Количество</label>
-						<input asp-for="Quantity" class="form-control" id="quantity-input"/>
-						<span asp-validation-for="Quantity" class="text-danger"></span>
+
+
+				</div>
+			</div>
+			<div class="column">
+
+
+
+
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+				<div class="form-group">
+					<label asp-for="Customer.FirstName" class="control-label"></label>
+					<input asp-for="Customer.FirstName" class="form-control" />
+					<span asp-validation-for="Customer.FirstName" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Customer.MiddleName" class="control-label"></label>
+					<input asp-for="Customer.MiddleName" class="form-control" />
+					<span asp-validation-for="Customer.MiddleName" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Customer.LastName" class="control-label"></label>
+					<input asp-for="Customer.LastName" class="form-control" />
+					<span asp-validation-for="Customer.LastName" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Customer.Address" class="control-label"></label>
+					<input asp-for="Customer.Address" class="form-control" />
+					<span asp-validation-for="Customer.Address" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Customer.Phone" class="control-label"></label>
+					<input asp-for="Customer.Phone" class="form-control" />
+					<span asp-validation-for="Customer.Phone" class="text-danger"></span>
+				</div>
+
+
+			</div>
+			<div class="column">
+
+				<fieldset>
+					<legend>Select Extra:</legend>
+					@{
+						var e = 0;
+
+					}
+					@foreach (var extra in ViewBag.ExtrasOptions)
+					{
+						<div id="extra-@extra.ExtraId">
+						<label><input type="checkbox" name="extras[@e].IsChecked" value="true" />@extra.ExtraName</label>
+						<br />
+						<input type="hidden" name="extras[@(e++)].ExtraId" value="@extra.ExtraId" />
+						
 					</div>
-					
-            </div>
-					
-				
+					}
+				</fieldset>
+				<br>
+				<div class="form-group">
+					<input type="hidden" asp-for="TotalSum" id="total-sum-input" />
+					<label><span id="total-price"></span></label>
+				</div>
+
+				<div class="form-group">
+					<input type="submit" value="Create" class="btn btn-primary" />
+				</div>
 			</div>
 		</div>
-		<div class="column">
-			
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Customer.FirstName" class="control-label"></label>
-                <input asp-for="Customer.FirstName" class="form-control" />
-                <span asp-validation-for="Customer.FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.MiddleName" class="control-label"></label>
-                <input asp-for="Customer.MiddleName" class="form-control" />
-                <span asp-validation-for="Customer.MiddleName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.LastName" class="control-label"></label>
-                <input asp-for="Customer.LastName" class="form-control" />
-                <span asp-validation-for="Customer.LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.Address" class="control-label"></label>
-                <input asp-for="Customer.Address" class="form-control" />
-                <span asp-validation-for="Customer.Address" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.Phone" class="control-label"></label>
-                <input asp-for="Customer.Phone" class="form-control" />
-                <span asp-validation-for="Customer.Phone" class="text-danger"></span>
-            </div>
-            
-        
-		</div>
-		<div class="column">
-
-    <fieldset>
-        <legend>Select Extra:</legend>
-		@{ var e = 0;}
-        @foreach(var extra in ViewBag.ExtrasOptions){
-
-			<label><input type="checkbox" name="extras[@e].IsChecked" value="true" />@extra.ExtraName</label><br/>
-			<input type="hidden" name="extras[@(e++)].ExtraId" value="@extra.ExtraId"/>
-		}
-    </fieldset>
-    <div class="form-group">
-						<input type="hidden" asp-for="TotalSum" id="total-sum-input" />
-                        <label>Total sum: <span id="total-sum"></span></label>
-					</div>
-    
-<div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-		</div>
-	</div>
-</form>
+	</form>
 	<div>
 		<a asp-action="Index">Back to List</a>
 	</div>
@@ -109,59 +124,85 @@
 	await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
 }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function calculatePrice() {
-        var carId = $('#car-select').val();
-        var quantity = $('#quantity-input').val();
-        
-        $('input[name^=extras]:checked').each(function() {
-            var extraId = $(this).attr('name').match(/\d+/)[0];
-            extras.push({ ExtraId: extraId, IsChecked: true });
-        });
-        $.ajax({
-            url: '/Order/CalculatePrice',
-            type: 'POST',
-            data: { carId: carId, quantity: quantity, extras: extras },
-            success: function(data, status, jqXHR) {
-                var price = data.price;
-                $('#total-price').text('Total price: ' + price);
-                $('#total-sum-input').val(price);
-                var totalSum = parseInt(price.match(/\d+/)[0]);
-                $('#total-sum').text(totalSum);
+		function calculatePrice() {
+			var carId = document.getElementById("Car");
+			var selectedCar = carId.value;
+			var quantity = $('#quantity-input').val();
+			var selectedExtras  = [];
+			
 
-            },
-            error: function(jqXHR, status, error) {
-                $('#total-price').text('Error calculating price');
-            }
-        });
-    });
-});
+			$('div[id^=extra-] input[name^=extras]:checked').each(function() {
+    var extraId = $(this).closest('div').attr('id').match(/\d+/)[0];
+    selectedExtras.push({ ExtraId: extraId, IsChecked: true });
+    console.log(extraId)
+  });
+			
+			$.ajax({
+				url: '/Order/CalculatePrice',
+				type: 'POST',
+				data: { carId: selectedCar, quantity: quantity, extra: selectedExtras   },
+				success: function(data, status, jqXHR) {
+					var price = data.price;
+					$('#total-price').text('Total price: ' + price);
+					$('#total-sum-input').val(price);
+					 var totalSum = 0;
+    if (price && typeof price === 'string' && price.match(/\d+/)) {
+        totalSum = parseInt(price.match(/\d+/)[0]);
+    }
+    
+					$('#total-sum').text(totalSum);
+					if (data.errorMessage) {
+        console.error(data.errorMessage);
+        return;
+    }
+				},
+				error: function(jqXHR, status, error) {
+					$('#total-price').text('Error calculating price');
+				}
+			});
+		}
 
-function updateOriginalPrice() {
-    var selectedCarId = $("#car-dropdown").val();
-    $.ajax({
-        url: "/Order/GetCarPrice",
-        type: "GET",
-        data: {
-            carId: selectedCarId
-        },
-        success: function(data, status, jqXHR) {
-            var originalPrice = data.price;
-            $("#original-price").text("Original price: $" + originalPrice);
-        },
-        error: function(jqXHR, status, error) {
-            console.error(error);
-        }
-    });
-}
-$(document).ready(function() {
-    // Call updateOriginalPrice when the page loads
-    updateOriginalPrice();
+		function updateOriginalPrice() {
+			console.log("JS code running");
+			var carId = document.getElementById("Car");
+			var selectedCar = carId.value;
+			console.log(selectedCar)
+			$.ajax({
+				url: "/Order/GetCarPrice",
+				type: "GET",
+				data: {
+					carId: selectedCar
+				},
+				success: function(data, status, jqXHR) {
+					 if (data.errorMessage) {
+        console.error(data.errorMessage);
+        return;
+    }
+					var originalPrice = data.ogPrice;
+					$("#original-price").text("Original Price: $" + originalPrice);
+				},
+				error: function(jqXHR, status, error) {
+					console.error(error);
+					}
+				});
+			}
+			$(document).ready(function() {
+				// Call updateOriginalPrice when the page loads
+				updateOriginalPrice();
 
-    // Call updateOriginalPrice whenever the car selection changes
-    $("#car-dropdown").on("change", function() {
-        updateOriginalPrice();
-    });
+				// Call updateOriginalPrice whenever the car selection changes
+				$("#Car").on("input", function() {
+					updateOriginalPrice();
+				});
 
-});
+				// Call calculatePrice when the quantity or any extra changes
+				$('#quantity-input, input[name^=extras]').on('change', function() {
+					calculatePrice();
+				});
+
+				// Call calculatePrice when the page loads
+				calculatePrice();
+			});
 </script>
