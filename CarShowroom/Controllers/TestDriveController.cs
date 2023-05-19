@@ -1,6 +1,7 @@
 ﻿using CarShowroom.Data;
 using CarShowroom.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
@@ -22,24 +23,30 @@ namespace CarShowroom.Controllers
             
         }
         [HttpGet]
-        public ActionResult Details(int id)
+        public ActionResult Details(int id,int carId,int CustomerId)
         {
-            var td = carShowroomContext.TestDrives.FirstOrDefault(x => x.TestDriveId == id);
+            var cust = carShowroomContext.Customers.FirstOrDefault(x => x.CustomerId == CustomerId);
+            var model = carShowroomContext.Cars.FirstOrDefault(x => x.CarId == carId);
+            var td = carShowroomContext.TestDrives.FirstOrDefault(x => x.TestDriveId == id || x.CarId == carId || x.CustomerId == CustomerId);
             return View("Details", td);
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(int id, int custid)
+        public async Task<IActionResult> Edit(int id, int custid,int carId)
         {
             var td = await carShowroomContext.TestDrives.FirstOrDefaultAsync(x => x.TestDriveId == id);
             var cust = await carShowroomContext.Customers.FirstOrDefaultAsync(x => x.CustomerId == custid);
+            var carIddd = await carShowroomContext.Cars.FirstOrDefaultAsync(x => x.CarId == carId);
             if (td != null)
             {
                 var tds = new TestDrive()
                 {
                    TestDriveId = td.TestDriveId,
-                   CarId = td.CarId,
                    DateOfTestDrive = td.DateOfTestDrive,
                    DateOfQuery = td.DateOfQuery
+                };
+                var model = new Car
+                {
+                    Model = carIddd.Model
                 };
                 var custom = new Customer()
                 {
@@ -56,21 +63,16 @@ namespace CarShowroom.Controllers
             
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(TestDrive testDrive, Customer customer)
+        public async Task<IActionResult> Edit(TestDrive testDrive, Customer customer,int selectedCarId)
         {
             var cars = carShowroomContext.Cars.ToList();
-            var options = new StringBuilder();
-            foreach (var car in cars)
-            {
-                options.AppendFormat("<option value=\"{0}\">{1}</option>", car.CarId, car.Model);
-            }
-            ViewBag.CustomerOptions = options.ToString();
+            ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
             var td = await carShowroomContext.TestDrives.FindAsync(testDrive.TestDriveId);
             var cust = await carShowroomContext.Customers.FindAsync(customer.CustomerId);
             if(td != null)
             {
                 td.TestDriveId = testDrive.TestDriveId;
-                td.CarId = testDrive.CarId;
+                td.CarId = selectedCarId;
                 td.DateOfTestDrive = testDrive.DateOfTestDrive;
                 td.DateOfQuery = testDrive.DateOfQuery;
                 td.CustomerId = customer.CustomerId;
@@ -85,7 +87,7 @@ namespace CarShowroom.Controllers
         }
         public async Task<IActionResult> Delete(TestDrive testDrive)
         {
-            var td = await carShowroomContext.TestDrives.FindAsync();
+            var td = await carShowroomContext.TestDrives.FindAsync(testDrive.TestDriveId);
             if (td != null)
             {
                 carShowroomContext.TestDrives.Remove(testDrive);
@@ -97,11 +99,11 @@ namespace CarShowroom.Controllers
         public ActionResult Create()
         {
             var cars = carShowroomContext.Cars.ToList();
-            ViewBag.CustomerOptions = cars;
+            ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
             return View("Create");
         }
         [HttpPost]
-        public async Task<IActionResult> ProcessCreate(TestDrive testDrive,Customer customer)
+        public async Task<IActionResult> ProcessCreate(TestDrive testDrive,Customer customer,int selectedCarId)
         {
             var cust = new Customer()
             {
@@ -118,9 +120,9 @@ namespace CarShowroom.Controllers
             var td = new TestDrive()
             {
                 TestDriveId = testDrive.TestDriveId,
-                CarId = testDrive.CarId,
+                CarId = selectedCarId,
                 DateOfTestDrive = testDrive.DateOfTestDrive,
-                DateOfQuery = testDrive.DateOfQuery,
+                DateOfQuery = DateTime.Now,
                 CustomerId = customerId
             };
             
@@ -129,5 +131,6 @@ namespace CarShowroom.Controllers
             ViewBag.Message = "TestDrive created SUCCESFULLY!";
             return View("Details");
         }
+        
     }
 }

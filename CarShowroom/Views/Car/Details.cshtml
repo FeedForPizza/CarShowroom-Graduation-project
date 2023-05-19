@@ -121,7 +121,26 @@
         </dd>
     </dl>
 </div>
+<div id="player"></div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.CarId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+<script>(function() {
+  var tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api?key=AIzaSyBe2L50eqwOmkrqZFe9wqYkqOoOwEJpPgY';
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+})();
+
+// Create an <iframe> (YouTube Player) after the API code downloads
+var player;
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    height: '360',
+    width: '640',
+    videoId: 'X3cVttIXmOs', // Replace with the YouTube video ID
+  });
+}
+</script>

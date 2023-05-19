@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace CarShowroom.Controllers
 {
@@ -17,16 +19,19 @@ namespace CarShowroom.Controllers
 
             carShowroomContext = showroomContext;
         }
-
+        [HttpGet]
         public IActionResult Index()
         {
             var orders = carShowroomContext.Orders.ToList();
             return View("Index", orders);
         }
         [HttpGet]
-        public ActionResult Details(int id)
+        public ActionResult Details(int id,int carId, int custid)
         {
+            
             var order = carShowroomContext.Orders.FirstOrDefault(x => x.OrderId == id);
+            var customer = carShowroomContext.Customers.FirstOrDefault(x => x.CustomerId == custid);
+            var car = carShowroomContext.Cars.FirstOrDefault(x => x.CarId == carId);
             return View("Details", order);
         }
         [HttpGet]
@@ -50,31 +55,36 @@ namespace CarShowroom.Controllers
             }
             return View("Edit", order);
         }
-        public async Task<IActionResult> Edit(Order order)
+        public async Task<IActionResult> Edit(Order order, int selectedCarId)
         {
-            var orders = await carShowroomContext.Orders.FindAsync(order.OrderId);
+            var orders = await carShowroomContext.Orders.Include(x=>x.Car).Include(x=>x.Customer).FirstOrDefaultAsync(x=> x.OrderId == order.OrderId);
             if (orders != null)
             {
                 orders.OrderId = order.OrderId;
                 orders.OriginalPrice = order.OriginalPrice;
                 orders.TotalSum = order.TotalSum;
                 orders.Quantity = order.Quantity;
-                orders.CarId = order.CarId;
+                orders.CarId = selectedCarId;
                 orders.CustomerId = order.CustomerId;
+                orders.Customer.FirstName = order.Customer.FirstName;
+                orders.Customer.MiddleName = order.Customer.MiddleName;
+                orders.Customer.LastName = order.Customer.LastName;
+                orders.Customer.Phone = order.Customer.Phone;
+                orders.Customer.Address = order.Customer.Address;
                 await carShowroomContext.SaveChangesAsync();
 
             }
-            return View("Details", order);
+            return View("Details", orders);
         }
         public async Task<IActionResult> Delete(Order order)
         {
-            var orders = await carShowroomContext.Orders.FindAsync();
+            var orders = await carShowroomContext.Orders.FindAsync(order.OrderId);
             if (orders != null)
             {
                 carShowroomContext.Orders.Remove(order);
                 await carShowroomContext.SaveChangesAsync();
             }
-            return View("Delete");
+            return View("Index");
         }
         [HttpGet]
         public ActionResult Create()
@@ -125,7 +135,7 @@ namespace CarShowroom.Controllers
             return Json(new { ogPrice = car.OriginalPrice });
         }
         [HttpPost]
-        public async Task<IActionResult> CreateProcess(Order order, List<ExtraViewModel> extras, Customer customer)
+        public async Task<IActionResult> CreateProcess(Order order, List<ExtraViewModel> extras, Customer customer, string email)
         {
 
             await carShowroomContext.SaveChangesAsync();
@@ -161,12 +171,36 @@ namespace CarShowroom.Controllers
                 await carShowroomContext.OrderExtras.AddAsync(oe);
             }
             await carShowroomContext.SaveChangesAsync();
-            ViewBag.Message = "Order made successfully!";
+            return RedirectToAction("CreateCardPayment", new { totalSum = order.TotalSum, email });
+            //return RedirectToAction("ProcessPayment",new { email });
+        }
+        public IActionResult CreateCardPayment(decimal totalSum, string email)
+        {
+            ViewBag.Email = email;
+            ViewBag.TotalSum = totalSum;
+            return View("CardPayment");
+        }
+        [HttpGet]
+        public IActionResult ProcessPayment(string email)
+        {
+            // Process the payment and perform any necessary operations
+
+            // Send confirmation email using SendGrid
+            var apiKey = "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";
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress("krisito_dt@abv.bg", "Krisi");
+            var subject = "Payment Confirmation";
+            var to = new EmailAddress(email);
+            var plainTextContent = "Thank you for your payment!";
+            var htmlContent = "<p>Thank you for your payment!</p>";
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+            var response = client.SendEmailAsync(msg).Result;
+
+            return RedirectToAction("PaymentConfirmation");
+        }
+        public IActionResult PaymentConfirmation()
+        {
             return View("Details");
         }
-        //public ActionResult CalculatePrice()
-        //{
-
-        //}
     }
 }

@@ -24,16 +24,40 @@
             @Html.DisplayFor(model => model.DateOfQuery)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Car)
+            @Html.DisplayNameFor(model => model.Car.Model)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Car.CarId)
+            @Html.DisplayFor(model => model.Car.Model)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
+            @Html.DisplayNameFor(model => model.Customer.FirstName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Customer.CustomerId)
+            @Html.DisplayFor(model => model.Customer.FirstName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Customer.MiddleName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Customer.MiddleName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Customer.LastName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Customer.LastName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Customer.Phone)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Customer.Phone)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Customer.Address)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Customer.Address)
         </dd>
     </dl>
 </div>

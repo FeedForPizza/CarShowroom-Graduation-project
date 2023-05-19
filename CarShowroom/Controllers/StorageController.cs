@@ -17,8 +17,10 @@ namespace CarShowroom.Controllers
             var storageItems = carShowroomContext.Storages.ToList();
             return View("Index",storageItems);
         }
-        public ActionResult Details()
+        [HttpGet]
+        public ActionResult Details(int id)
         {
+            var cars = carShowroomContext.Storages.FirstOrDefault(x => x.StorageId == id);
             return View("Details");
         }
         public ActionResult Edit()

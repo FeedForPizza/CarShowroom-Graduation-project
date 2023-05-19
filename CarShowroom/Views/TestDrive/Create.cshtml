@@ -25,12 +25,8 @@
                 <span asp-validation-for="TestDriveId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CarId" class="control-label" ></label>
-                    @foreach(var car in ViewBag.CustomerOptions)
-                    {
-                        <option asp-for="CarId" class ="form-control" value="@car.CarId">@car.Model</option>
-                    }
-                    
+                <label asp-for="CarId" class="control-label"> Модел кола: </label>
+                   @Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Select Model", new{@class = "form-control",name ="selectedCarId"})
             </div>
             <div class="form-group">
                 <label asp-for="DateOfTestDrive" class="control-label"></label>
@@ -39,7 +35,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="DateOfQuery" class="control-label"></label>
-                <input asp-for="DateOfQuery" class="form-control" />
+                <input asp-for="DateOfQuery" type="hidden" class="form-control" />
                 <span asp-validation-for="DateOfQuery" class="text-danger"></span>
             </div>
         </form>
@@ -79,7 +75,9 @@
         </form>
     </div>
 </div>
-
+<div>
+ 
+</div>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

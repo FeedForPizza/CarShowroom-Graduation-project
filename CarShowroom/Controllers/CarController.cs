@@ -1,6 +1,7 @@
 ﻿
 using CarShowroom.Data;
 using CarShowroom.Entities;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,10 @@ namespace CarShowroom.Controllers
     {
 
         private readonly CarShowroomContext carShowroomContext;
+        
         public CarController(CarShowroomContext showroomContext)
         {
-
+           
             carShowroomContext = showroomContext;
         }
 
@@ -25,6 +27,7 @@ namespace CarShowroom.Controllers
         public ActionResult Details(int id)
         {
             var cars = carShowroomContext.Cars.FirstOrDefault(x => x.CarId == id);
+           
             return View("Details", cars);
         }
         [HttpGet]
@@ -94,7 +97,7 @@ namespace CarShowroom.Controllers
         }
         public async Task<IActionResult> Delete(Car car)
         {
-            var cars = await carShowroomContext.Cars.FindAsync();
+            var cars = await carShowroomContext.Cars.FindAsync(car.CarId);
             if(cars != null)
             {
                 carShowroomContext.Cars.Remove(car);
