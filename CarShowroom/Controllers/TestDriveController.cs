@@ -23,11 +23,10 @@ namespace CarShowroom.Controllers
             
         }
         [HttpGet]
-        public ActionResult Details(int id,int carId,int CustomerId)
+        public ActionResult Details(int id)
         {
-            var cust = carShowroomContext.Customers.FirstOrDefault(x => x.CustomerId == CustomerId);
-            var model = carShowroomContext.Cars.FirstOrDefault(x => x.CarId == carId);
-            var td = carShowroomContext.TestDrives.FirstOrDefault(x => x.TestDriveId == id || x.CarId == carId || x.CustomerId == CustomerId);
+            var td = carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == id);
+            
             return View("Details", td);
         }
         [HttpGet]

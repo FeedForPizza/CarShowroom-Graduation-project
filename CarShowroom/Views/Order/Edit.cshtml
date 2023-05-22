@@ -77,10 +77,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-<script>
-    // get the <select> element
-    var customerSelect = document.getElementById("customer-select");
-
-    // set the options for the <select> element
-    customerSelect.innerHTML = '@Html.Raw(ViewBag.CustomerOptions)';
-</script>

@@ -192,6 +192,14 @@
 					}
 				});
 			}
+			$.ajax({
+    url: "/Order/CreateProcess",
+    type: "POST",
+    data: {
+        originalPrice: originalPrice,
+        // other data properties
+    },
+});
 			$(document).ready(function() {
 				// Call updateOriginalPrice when the page loads
 				updateOriginalPrice();

@@ -26,19 +26,19 @@ namespace CarShowroom.Controllers
             return View("Index", orders);
         }
         [HttpGet]
-        public ActionResult Details(int id,int carId, int custid)
+        public ActionResult Details(int id)
         {
             
-            var order = carShowroomContext.Orders.FirstOrDefault(x => x.OrderId == id);
-            var customer = carShowroomContext.Customers.FirstOrDefault(x => x.CustomerId == custid);
-            var car = carShowroomContext.Cars.FirstOrDefault(x => x.CarId == carId);
+            var order = carShowroomContext.Orders.Include(x => x.Car).Include(x=>x.Customer).FirstOrDefaultAsync(x => x.OrderId == id);
+            
             return View("Details", order);
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(int id, int custid)
+        public async Task<IActionResult> Edit(int id)
         {
-            var order = await carShowroomContext.Orders.FirstOrDefaultAsync(x => x.OrderId == id);
-            var custoomer = await carShowroomContext.Customers.FirstOrDefaultAsync(y => y.CustomerId == custid);
+            var order = await carShowroomContext.Orders.Include(x=>x.Car).Include(x=>x.Customer).FirstOrDefaultAsync(x => x.OrderId == id);
+            var cars = carShowroomContext.Cars.ToList();
+            ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
             if (order != null)
             {
 
@@ -135,10 +135,10 @@ namespace CarShowroom.Controllers
             return Json(new { ogPrice = car.OriginalPrice });
         }
         [HttpPost]
-        public async Task<IActionResult> CreateProcess(Order order, List<ExtraViewModel> extras, Customer customer, string email)
+        public async Task<IActionResult> CreateProcess(Order order, List<ExtraViewModel> extras, Customer customer, string email,decimal oriPrice)
         {
 
-            await carShowroomContext.SaveChangesAsync();
+            //await carShowroomContext.SaveChangesAsync();
             var cust = new Customer()
             {
 
@@ -154,7 +154,8 @@ namespace CarShowroom.Controllers
             var orders = new Order
             {
                 
-                OriginalPrice = order.OriginalPrice,
+                OriginalPrice = oriPrice,
+                Quantity = order.Quantity,
                 TotalSum = order.TotalSum,
                 CarId = order.CarId,
                 CustomerId = custId
