@@ -187,12 +187,12 @@ public partial class CarShowroomContext : DbContext
                 .IsClustered(false);
 
             entity.ToTable("TestDrive", "19118133");
-
+            
             entity.HasIndex(e => e.CarId, "Relationship_3_FK");
 
             entity.Property(e => e.TestDriveId)
                 .ValueGeneratedNever()
-                .HasColumnName("TestDriveID");
+                .HasColumnName("TestDriveID").ValueGeneratedOnAdd();
             entity.Property(e => e.CarId).HasColumnName("CarID");
             entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
             entity.Property(e => e.DateOfQuery).HasColumnType("datetime");

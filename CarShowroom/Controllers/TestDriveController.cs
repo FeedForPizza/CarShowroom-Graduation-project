@@ -23,38 +23,30 @@ namespace CarShowroom.Controllers
             
         }
         [HttpGet]
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
-            var td = carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == id);
+            var td = await carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == id);
             
             return View("Details", td);
         }
         [HttpGet]
-        public async Task<IActionResult> Edit(int id, int custid,int carId)
+        public async Task<IActionResult> Edit(int id)
         {
-            var td = await carShowroomContext.TestDrives.FirstOrDefaultAsync(x => x.TestDriveId == id);
-            var cust = await carShowroomContext.Customers.FirstOrDefaultAsync(x => x.CustomerId == custid);
-            var carIddd = await carShowroomContext.Cars.FirstOrDefaultAsync(x => x.CarId == carId);
+            var td = await carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == id);
+            var cars = carShowroomContext.Cars.ToList();
+            ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
             if (td != null)
             {
                 var tds = new TestDrive()
                 {
-                   TestDriveId = td.TestDriveId,
-                   DateOfTestDrive = td.DateOfTestDrive,
-                   DateOfQuery = td.DateOfQuery
+                    TestDriveId = td.TestDriveId,
+                    DateOfTestDrive = td.DateOfTestDrive,
+                    DateOfQuery = td.DateOfQuery,
+                    CarId = td.CarId,
+                    CustomerId = td.CustomerId
+
                 };
-                var model = new Car
-                {
-                    Model = carIddd.Model
-                };
-                var custom = new Customer()
-                {
-                    FirstName = cust.FirstName,
-                    MiddleName = cust.MiddleName,
-                    LastName = cust.LastName,
-                    Address = cust.Address,
-                    Phone = cust.Phone
-                };
+                
 
             };
 
@@ -62,24 +54,23 @@ namespace CarShowroom.Controllers
             
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(TestDrive testDrive, Customer customer,int selectedCarId)
+        public async Task<IActionResult> Edit(TestDrive testDrive,int selectedCarId)
         {
-            var cars = carShowroomContext.Cars.ToList();
-            ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
-            var td = await carShowroomContext.TestDrives.FindAsync(testDrive.TestDriveId);
-            var cust = await carShowroomContext.Customers.FindAsync(customer.CustomerId);
-            if(td != null)
+            
+            var td = await carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == testDrive.TestDriveId);
+            if (td != null)
             {
                 td.TestDriveId = testDrive.TestDriveId;
-                td.CarId = selectedCarId;
                 td.DateOfTestDrive = testDrive.DateOfTestDrive;
-                td.DateOfQuery = testDrive.DateOfQuery;
-                td.CustomerId = customer.CustomerId;
-                cust.FirstName = customer.FirstName;    
-                cust.MiddleName = customer.MiddleName;
-                cust.LastName = customer.LastName;
-                cust.Address = customer.Address;
-                cust.Phone = customer.Phone;
+                td.DateOfQuery = DateTime.Now;
+                td.CarId = selectedCarId;
+                td.CustomerId = testDrive.CustomerId;
+                td.Customer.FirstName = testDrive.Customer.FirstName;
+                td.Customer.MiddleName = testDrive.Customer.MiddleName;
+                td.Customer.LastName = testDrive.Customer.LastName;
+                td.Customer.Phone = testDrive.Customer.Phone;
+                td.Customer.Address = testDrive.Customer.Address;
+                await carShowroomContext.SaveChangesAsync();
 
             }
             return View("Details");
@@ -102,8 +93,10 @@ namespace CarShowroom.Controllers
             return View("Create");
         }
         [HttpPost]
-        public async Task<IActionResult> ProcessCreate(TestDrive testDrive,Customer customer,int selectedCarId)
+        public async Task<IActionResult> ProcessCreate(TestDrive testDrive,Customer customer)
         {
+            
+
             var cust = new Customer()
             {
                 
@@ -118,16 +111,15 @@ namespace CarShowroom.Controllers
             int customerId = cust.CustomerId;
             var td = new TestDrive()
             {
-                TestDriveId = testDrive.TestDriveId,
-                CarId = selectedCarId,
+                CarId = testDrive.CarId,
                 DateOfTestDrive = testDrive.DateOfTestDrive,
                 DateOfQuery = DateTime.Now,
                 CustomerId = customerId
             };
-            
+
             await carShowroomContext.TestDrives.AddAsync(td);
             await carShowroomContext.SaveChangesAsync();
-            ViewBag.Message = "TestDrive created SUCCESFULLY!";
+           
             return View("Details");
         }
         

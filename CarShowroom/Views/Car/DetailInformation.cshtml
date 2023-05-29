@@ -1,0 +1,146 @@
+﻿@model IEnumerable<CarShowroom.Entities.Car>
+
+@{
+    ViewData["Title"] = "DetailInformation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>DetailInformation</h1>
+
+<!-- First grid with cars -->
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Model</th>
+            <th>HP</th>
+            <th>Fuel Type</th>
+            <th>Seats</th>
+            <th>Compartment Type</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var car in Model)
+        {
+            <tr id="@car.CarId" class="carRow">
+                <td>@Html.DisplayFor(modelItem => car.Model)</td>
+                <td>@Html.DisplayFor(modelItem => car.Hp)</td>
+                <td>@Html.DisplayFor(modelItem => car.TypeFuel)</td>
+                <td>@Html.DisplayFor(modelItem => car.NumberOfSeats)</td>
+                <td>@Html.DisplayFor(modelItem => car.TypeCompartment)</td>
+                <td>@Html.DisplayFor(modelItem => car.OriginalPrice)</td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Second grid with test drives -->
+
+        <table class="table" id="testDriveGrid">
+            <thead>
+                <tr>
+                    <th>Date of Test Drive</th>
+                    <th>Date of Query</th>
+                    <th>Customer ID</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var car in Model) {
+                @foreach (var testDrive in car.TestDrives) {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => testDrive.DateOfTestDrive)</td>
+                        <td>@Html.DisplayFor(modelItem => testDrive.DateOfQuery)</td>
+                        <td>@Html.DisplayFor(modelItem => testDrive.CustomerId)</td>
+                        <td></td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+        <button id="exportButton">Export to XML</button>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                // Capture click event on car row
+                $("tr.carRow").click(function () {
+                    var carId = $(this).attr('id'); // Get the car ID from the clicked row
+
+                    // Clear existing test drive rows
+                    $("#testDriveGrid tbody").empty();
+
+                    // Fetch test drives for the selected car
+                    $.ajax({
+                        url: "/Car/GetTestDrives",
+                        type: "GET",
+                        data: { carId: carId },
+                        dataType: "json",
+                        success: function (result) {
+                            // Iterate through the test drives and construct HTML markup for the rows
+                            $.each(result, function (index, testDrive) {
+                        var row = $("<tr>");
+                        row.append($("<td>").text(testDrive.dateOfTestDrive));
+                        row.append($("<td>").text(testDrive.dateOfQuery));
+                        row.append($("<td>").text(testDrive.customerId));
+                        row.append($("<td>"));
+                        $("#testDriveGrid tbody").append(row);
+                    });
+
+                            // Update the second grid with the constructed rows
+                            $("#testDriveGrid tbody").html(rows);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                });
+            });
+            $(document).ready(function() {
+  $("#exportButton").click(function() {
+    // Call a function to export the data to XML
+    exportToXML();
+  });
+});
+function exportToXML() {
+  // Create a new XML document
+  var xmlDoc = document.implementation.createDocument(null, "testDrives");
+
+  // Get the table rows in the second grid
+  var rows = $("#testDriveGrid tbody tr");
+
+  // Iterate through the rows and extract the data
+  rows.each(function(index) {
+    var row = $(this);
+    var testDrive = xmlDoc.createElement("testDrive");
+
+    // Extract the data from the row
+    var dateOfTestDrive = row.find("td:nth-child(1)").text();
+    var dateOfQuery = row.find("td:nth-child(2)").text();
+    var customerId = row.find("td:nth-child(3)").text();
+
+    // Create XML elements and append them to the testDrive element
+    var dateOfTestDriveElement = xmlDoc.createElement("dateOfTestDrive");
+    dateOfTestDriveElement.textContent = dateOfTestDrive;
+    testDrive.appendChild(dateOfTestDriveElement);
+
+    var dateOfQueryElement = xmlDoc.createElement("dateOfQuery");
+    dateOfQueryElement.textContent = dateOfQuery;
+    testDrive.appendChild(dateOfQueryElement);
+
+    var customerIdElement = xmlDoc.createElement("customerId");
+    customerIdElement.textContent = customerId;
+    testDrive.appendChild(customerIdElement);
+
+    // Append the testDrive element to the root of the XML document
+    xmlDoc.documentElement.appendChild(testDrive);
+  });
+
+  // Serialize the XML document to a string
+  var xmlString = new XMLSerializer().serializeToString(xmlDoc);
+
+  // Log the XML string (you can replace this with your desired export logic)
+  console.log(xmlString);
+}
+        </script>

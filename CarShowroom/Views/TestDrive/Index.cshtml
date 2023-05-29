@@ -10,39 +10,39 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DateOfTestDrive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateOfQuery)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Car)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateOfTestDrive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateOfQuery)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Car.CarId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Customer.CustomerId)
-            </td>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.DateOfTestDrive)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DateOfQuery)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Car)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Customer)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateOfTestDrive)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateOfQuery)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Car.CarId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Customer.CustomerId)
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.TestDriveId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.TestDriveId">Details</a> |

@@ -4,6 +4,7 @@ using CarShowroom.Entities;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace CarShowroom.Controllers
 {
@@ -64,6 +65,60 @@ namespace CarShowroom.Controllers
 
             return View("Edit", cars);
 
+        }
+        [HttpGet]
+        public ActionResult DetailInformation()
+        {
+            var cars = carShowroomContext.Cars.Include(c => c.TestDrives).ToList();
+            return View("DetailInformation",cars);
+        }
+        [HttpGet]
+        public IActionResult GetTestDrives(int carId)
+        {
+            var testDrives = carShowroomContext.TestDrives.Where(td => td.CarId == carId).ToList();
+            return Json(testDrives);
+        }
+        [HttpGet]
+        public IActionResult ExportToXml()
+        {
+            var cars = carShowroomContext.Cars.Include(c => c.TestDrives).ToList();
+
+            // Create an XML document
+            var xmlDoc = new XDocument();
+            var rootElement = new XElement("testDrives");
+
+            // Iterate through the cars and test drives and add them to the XML document
+            foreach (var car in cars)
+            {
+                foreach (var testDrive in car.TestDrives)
+                {
+                    var testDriveElement = new XElement("testDrive",
+                        new XElement("dateOfTestDrive", testDrive.DateOfTestDrive),
+                        new XElement("dateOfQuery", testDrive.DateOfQuery),
+                        new XElement("customerId", testDrive.CustomerId)
+                    );
+                    rootElement.Add(testDriveElement);
+                }
+            }
+
+            xmlDoc.Add(rootElement);
+
+            // Set the response content type to "application/xml"
+            Response.ContentType = "application/xml";
+
+            // Set the file name and content disposition header for the download
+            var fileName = "testDrives.xml";
+            Response.Headers.Add("Content-Disposition", "attachment; filename=" + fileName);
+
+            // Write the XML document to the response stream
+            using (var stream = new MemoryStream())
+            {
+                xmlDoc.Save(stream);
+                stream.Position = 0;
+                stream.CopyTo(Response.Body);
+            }
+
+            return new EmptyResult();
         }
         [HttpPost]
         public async Task<IActionResult> Edit(Car car)

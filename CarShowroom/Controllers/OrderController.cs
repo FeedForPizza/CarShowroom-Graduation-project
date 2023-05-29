@@ -26,10 +26,10 @@ namespace CarShowroom.Controllers
             return View("Index", orders);
         }
         [HttpGet]
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
             
-            var order = carShowroomContext.Orders.Include(x => x.Car).Include(x=>x.Customer).FirstOrDefaultAsync(x => x.OrderId == id);
+            var order = await carShowroomContext.Orders.Include(x => x.Car).Include(x=>x.Customer).FirstOrDefaultAsync(x => x.OrderId == id);
             
             return View("Details", order);
         }
@@ -49,12 +49,13 @@ namespace CarShowroom.Controllers
                     TotalSum = order.TotalSum,
                     Quantity = order.Quantity,
                     CarId = order.CarId,
-
+                    CustomerId = order.CustomerId
                 };
 
             }
             return View("Edit", order);
         }
+        [HttpPost]
         public async Task<IActionResult> Edit(Order order, int selectedCarId)
         {
             var orders = await carShowroomContext.Orders.Include(x=>x.Car).Include(x=>x.Customer).FirstOrDefaultAsync(x=> x.OrderId == order.OrderId);
