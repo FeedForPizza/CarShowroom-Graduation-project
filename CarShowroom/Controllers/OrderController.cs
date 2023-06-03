@@ -25,6 +25,7 @@ namespace CarShowroom.Controllers
             var orders = carShowroomContext.Orders.ToList();
             return View("Index", orders);
         }
+
         [HttpGet]
         public async Task<ActionResult> Details(int id)
         {
@@ -203,6 +204,64 @@ namespace CarShowroom.Controllers
         public IActionResult PaymentConfirmation()
         {
             return View("Details");
+        }
+        public IActionResult GenerateOrderReport(string carModel, int? customerId, string sortOrder)
+        {
+            // Get the orders from the database based on the given criteria
+            var query = carShowroomContext.Orders
+                .Include(o => o.Car)
+                .Include(o => o.Customer)
+                .AsQueryable();
+
+            // Apply filtering criteria
+            if (!string.IsNullOrEmpty(carModel))
+            {
+                query = query.Where(o => o.Car.Model == carModel);
+            }
+
+            if (customerId.HasValue)
+            {
+                query = query.Where(o => o.CustomerId == customerId.Value);
+            }
+
+            // Apply sorting criteria
+            switch (sortOrder)
+            {
+                case "model_asc":
+                    query = query.OrderBy(o => o.Car.Model);
+                    break;
+                case "model_desc":
+                    query = query.OrderByDescending(o => o.Car.Model);
+                    break;
+                case "total_sum_asc":
+                    query = query.OrderBy(o => o.TotalSum);
+                    break;
+                case "total_sum_desc":
+                    query = query.OrderByDescending(o => o.TotalSum);
+                    break;
+                // Add more sorting options as needed
+                default:
+                    query = query.OrderBy(o => o.OrderId);
+                    break;
+            }
+
+            // Perform the query and retrieve the data
+            var orders = query.ToList();
+
+            // Map the orders to the OrderReportModel
+            var reportData = orders.Select(o => new OrderReportModel
+            {
+                OrderId = o.OrderId,
+                OriginalPrice = o.OriginalPrice,
+                TotalSum = o.TotalSum,
+                Quantity = o.Quantity,
+                CarModel = o.Car?.Model,
+                CustomerName = o.Customer.FirstName +" "+ o.Customer.MiddleName + " " + o.Customer.LastName
+                // Map additional aggregated metrics properties
+            });
+
+            // Return the report data to the view
+            return View(reportData);
         }
     }
 }

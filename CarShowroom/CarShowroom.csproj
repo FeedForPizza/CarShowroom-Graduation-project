@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="EficazFramework.Data.SqlLite" Version="6.1.3" />
+    <PackageReference Include="EPPlus" Version="6.2.4" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.16" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.16" />

@@ -4,6 +4,7 @@ using CarShowroom.Entities;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System.Xml.Linq;
 
 namespace CarShowroom.Controllers
@@ -77,6 +78,54 @@ namespace CarShowroom.Controllers
         {
             var testDrives = carShowroomContext.TestDrives.Where(td => td.CarId == carId).ToList();
             return Json(testDrives);
+        }
+        [HttpGet]
+        public IActionResult GetOrders(int carId)
+        {
+            var testDrives = carShowroomContext.Orders.Where(td => td.CarId == carId).ToList();
+            return Json(testDrives);
+        }
+        public IActionResult ExportToExcel()
+        {
+            // Fetch the data from the second grid
+            var testDrives = carShowroomContext.TestDrives.ToList();
+
+            // Create a new Excel package
+            using (var package = new ExcelPackage())
+            {
+                // Create the worksheet
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test Drives");
+
+                // Set the column headers
+                worksheet.Cells[1, 1].Value = "Date of Test Drive";
+                worksheet.Cells[1, 2].Value = "Date of Query";
+                worksheet.Cells[1, 3].Value = "Customer ID";
+
+                // Set the data rows
+                int row = 2;
+                foreach (var testDrive in testDrives)
+                {
+                    worksheet.Cells[row, 1].Value = testDrive.DateOfTestDrive;
+                    worksheet.Cells[row, 2].Value = testDrive.DateOfQuery;
+                    worksheet.Cells[row, 3].Value = testDrive.CustomerId;
+                    row++;
+                }
+
+                // Auto-fit the columns
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                // Set the content type and header for the response
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.Headers.Add("content-disposition", "attachment;  filename=testDrives.xlsx");
+
+                // Write the Excel package to the response stream
+                Response.Body.Write(package.GetAsByteArray());
+
+                // End the response
+                Response.CompleteAsync();
+            }
+
+            return Ok();
         }
         [HttpGet]
         public IActionResult ExportToXml()

@@ -37,13 +37,14 @@
 </table>
 
 <!-- Second grid with test drives -->
-
+<h3> TestDrives </h3>
         <table class="table" id="testDriveGrid">
             <thead>
                 <tr>
+                    <th>Customer ID</th>
                     <th>Date of Test Drive</th>
                     <th>Date of Query</th>
-                    <th>Customer ID</th>
+                    
                     <th></th>
                 </tr>
             </thead>
@@ -51,9 +52,33 @@
             @foreach (var car in Model) {
                 @foreach (var testDrive in car.TestDrives) {
                     <tr>
+                        <td>@Html.DisplayFor(modelItem => testDrive.CustomerId)</td>
                         <td>@Html.DisplayFor(modelItem => testDrive.DateOfTestDrive)</td>
                         <td>@Html.DisplayFor(modelItem => testDrive.DateOfQuery)</td>
-                        <td>@Html.DisplayFor(modelItem => testDrive.CustomerId)</td>
+                        
+                        <td></td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+        <h3> Orders </h3>
+        <table class="table" id="ordersGrid">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Total Sum</th>
+                    <th>Customer ID</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var car in Model) {
+                @foreach (var order in car.Orders) {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => order.OrderId)</td>
+                        <td>@Html.DisplayFor(modelItem => order.TotalSum)</td>
+                        <td>@Html.DisplayFor(modelItem => order.CustomerId)</td>
                         <td></td>
                     </tr>
                 }
@@ -61,6 +86,9 @@
             </tbody>
         </table>
         <button id="exportButton">Export to XML</button>
+
+        <button id="exportButton">Export to Excel</button>
+
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
             $(document).ready(function () {
@@ -81,9 +109,9 @@
                             // Iterate through the test drives and construct HTML markup for the rows
                             $.each(result, function (index, testDrive) {
                         var row = $("<tr>");
+                        row.append($("<td>").text(testDrive.customerId));
                         row.append($("<td>").text(testDrive.dateOfTestDrive));
                         row.append($("<td>").text(testDrive.dateOfQuery));
-                        row.append($("<td>").text(testDrive.customerId));
                         row.append($("<td>"));
                         $("#testDriveGrid tbody").append(row);
                     });
@@ -97,6 +125,46 @@
                     });
                 });
             });
+            $("#exportButton").click(function () {
+            // Trigger the export action
+            window.location.href = "/Car/ExportToExcel";
+        });
+            $(document).ready(function () {
+                // Capture click event on car row
+                $("tr.carRow").click(function () {
+                    var carId = $(this).attr('id'); // Get the car ID from the clicked row
+
+                    // Clear existing test drive rows
+                    $("#ordersGrid tbody").empty();
+
+                    // Fetch test drives for the selected car
+                    $.ajax({
+                        url: "/Car/GetOrders",
+                        type: "GET",
+                        data: { carId: carId },
+                        dataType: "json",
+                        success: function (result) {
+                            // Iterate through the test drives and construct HTML markup for the rows
+                            $.each(result, function (index, order) {
+                        var row = $("<tr>");
+                        row.append($("<td>").text(order.orderId));
+                        row.append($("<td>").text(order.totalSum));
+                        row.append($("<td>").text(order.customerId));
+                        row.append($("<td>"));
+                        $("#ordersGrid tbody").append(row);
+                    });
+
+                            // Update the second grid with the constructed rows
+                            $("#ordersGrid tbody").html(rows);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                });
+            });
+
+
             $(document).ready(function() {
   $("#exportButton").click(function() {
     // Call a function to export the data to XML

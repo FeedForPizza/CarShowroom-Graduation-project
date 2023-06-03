@@ -18,10 +18,57 @@ namespace CarShowroom.Controllers
 
         public IActionResult Index()
         {
-            var td = carShowroomContext.TestDrives.ToList();
+            var td = carShowroomContext.TestDrives
+    .Select(t => new
+    {
+        t.CarId,
+        t.CustomerId,
+        t.DateOfTestDrive,
+        t.DateOfQuery
+    })
+    .ToList();
+            var cars = carShowroomContext.Cars.ToList();
+            ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
             return View("Index", td);
             
         }
+        [HttpGet]
+        public ActionResult SearchMethod(int? carId, DateTime? startDate, DateTime? endDate, string sortColumn, string sortDirection)
+        {
+            IQueryable<TestDrive> searchResults = carShowroomContext.TestDrives;
+
+            if (carId.HasValue)
+            {
+                searchResults = searchResults.Where(t => t.CarId == carId.Value);
+            }
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                searchResults = searchResults.Where(t => t.DateOfTestDrive >= startDate.Value && t.DateOfTestDrive <= endDate.Value);
+            }
+            switch (sortColumn)
+            {
+                case "dateOfTestDrive":
+                    if (sortDirection == "asc")
+                        searchResults = searchResults.OrderBy(t => t.DateOfTestDrive);
+                    else
+                        searchResults = searchResults.OrderByDescending(t => t.DateOfTestDrive);
+                    break;
+                    // Add more cases for other columns if needed
+            }
+            var result = searchResults.Select(t => new
+            {
+                testDriveId = t.TestDriveId,
+                carId = t.CarId,
+                dateOfTestDrive = t.DateOfTestDrive,
+                dateOfQuery = t.DateOfQuery,
+                customerId = t.CustomerId
+            }).ToList();
+
+            return Json(result);
+        }
+
+        
         [HttpGet]
         public async Task<ActionResult> Details(int id)
         {
