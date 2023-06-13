@@ -4,37 +4,40 @@
 	ViewData["Title"] = "Create";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<style>
-	.column {
-		float: left;
-		width: 50%;
-	}
-</style>
-<h1>Create</h1>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
+<body>
+    <div class="containerCreateCar">
+<h2>Създаване на тест драйв</h2>
 
-<h4>TestDrive</h4>
+<h4>Тест драйв</h4>
 <hr />
 
 <form asp-action="ProcessCreate" method="post">
 	<div class="row">
 
-		<div class="column">
+		<div class="left-column">
 			<div class="col-md-4">
 				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 				<div class="form-group">
 					<label asp-for="CarId" class="control-label"> Модел кола: </label>
-					@Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Select Model", new{@class = "form-control",name ="selectedCarId"})
+					@Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Моля изберете кола", new{@class = "form-control",name ="selectedCarId"})
 				</div>
 				<div class="form-group">
 					<label asp-for="DateOfTestDrive" class="control-label"></label>
-					<input asp-for="DateOfTestDrive" class="form-control" />
+					<input asp-for="DateOfTestDrive" class="form-control" id="dateAndTimeOfTestDrive" required/>
 					<span asp-validation-for="DateOfTestDrive" class="text-danger"></span>
 				</div>
 
 			</div>
 		</div>
-		<div class="column">
+		<div class="right-column">
 
 			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 			<div class="form-group">
@@ -62,20 +65,45 @@
 				<input asp-for="Customer.Phone" class="form-control" />
 				<span asp-validation-for="Customer.Phone" class="text-danger"></span>
 			</div>
+<br>
 			<div class="form-group">
-				<input type="submit" value="Create" class="btn btn-primary" />
+				<input type="submit" value="Създай" class="btn" />
+				
 			</div>
+			
 		</div>
 
 
 	</div>
 </form>
+<br>
 <div>
-	<a asp-action="Index">Back to List</a>
+	<a href="@Url.Action("Index", "Home")"  class="btnBackToMain">Към началната страница</a>
 </div>
-
+</div>
 @section Scripts {
     @{
 	await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
 }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  jQuery(document).ready(function($) {
+    $("#dateAndTimeOfTestDrive").flatpickr({
+      minDate: "today",
+      enableTime: true,
+      noCalendar: false,
+      dateFormat: "Y-m-d H:i", // Display date and time
+      minTime: "10:00", // Minimum selectable time
+      maxTime: "18:00", // Maximum selectable time
+      time_24hr: true, // Use 24-hour format for time
+      // On value change, update the separate date and time input fields if necessary
+      onChange: function(selectedDates, dateStr, instance) {
+        // No need to update separate date and time input fields in this case
+      }
+    });
+  });
+</script>
+</body>

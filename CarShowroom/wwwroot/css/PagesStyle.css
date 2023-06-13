@@ -1,0 +1,96 @@
+﻿
+body {
+    background-color: rgba(45, 89, 134, 0.8);
+}
+
+h2 {
+    text-align: center;
+}
+
+.containerCreateCar {
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+}
+.left-column {
+    flex: 1;
+    padding-right: 20px;
+}
+.column {
+    flex: 1;
+    padding: 0 10px;
+}
+.right-column {
+    flex: 1;
+    padding-left: 20px;
+}
+.btnDelete {
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: rgb(204, 0, 0);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btnBackToMain {
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+    .btnBackToMain:hover {
+        background-color: rgb(198, 217, 236);
+        color: #404040;
+    }
+
+.btnDelete:hover {
+    background-color: rgb(204, 0, 0,0.3);
+}
+
+.btn {
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+
+.btnDDE {
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+    .btnDDE:hover {
+        background-color: rgb(198, 217, 236);
+        color: #404040;
+    }
+
+.btn:hover {
+    background-color: rgb(198, 217, 236);
+    color: #404040;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+.picture {
+    float: right;
+    max-width: 100%;
+    width: 450px; /* Adjust the width as needed */
+    height: auto;
+}
+

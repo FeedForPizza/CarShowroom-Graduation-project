@@ -1,0 +1,107 @@
+﻿@model CarShowroom.Entities.Extra
+
+@{
+    ViewData["Title"] = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        background-color: rgba(45, 89, 134, 0.8);
+    }
+    h2{
+        text-align: center;
+    }
+	.containerCreateCar{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+.btnDelete {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color: rgb(204, 0, 0);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.btnDelete:hover {
+    background-color:rgb(204, 0, 0,0.3);
+}
+	.btn {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+
+.btn:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+</style>
+<body>
+<div class="containerCreateCar">
+<h2>Изтриване</h2>
+
+<h3>Сигурни ли сте, че искате да изтриете този елемент?</h3>
+<div>
+    <h4>Екстра</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ExtraName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ExtraName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        
+    </dl>
+    
+        <a href="@Url.Action("DeleteConfirmation", "Extra", new { id = Model?.ExtraId})" class="btnDelete">Изтриване</a>
+        <a href="@Url.Action("Index", "Extra")"  class="btnBackToMain">Към списък с екстри</a>
+    
+</div>
+</div>
+</body>

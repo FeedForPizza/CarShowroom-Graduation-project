@@ -4,19 +4,58 @@
     ViewData["Title"] = "DetailInformation";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    body {
+        background-color: rgba(45, 89, 134, 0.8);
+    }
+	.containerCars{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+    .containerTD{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+    .containerOrder{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+	.btn {
+  display: inline-block;
+    padding: 10px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+.btn:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.button-container {
+    display: flex;
+    gap: 10px;
+}
 
-<h1>DetailInformation</h1>
-
+</style>
+<body>
+    <br>
+<div class="containerCars">
+    <h2 style="text-align: center">Детайлна информация</h2>
 <!-- First grid with cars -->
 <table class="table table-striped">
     <thead class="thead-dark">
         <tr>
-            <th>Model</th>
-            <th>HP</th>
-            <th>Fuel Type</th>
-            <th>Seats</th>
-            <th>Compartment Type</th>
-            <th>Price</th>
+            <th>Модел</th>
+            <th>Мощност (к.с.)</th>
+            <th>Вид гориво</th>
+            <th>Брой места</th>
+            <th>Купе</th>
+            <th>Цена</th>
             <th></th>
         </tr>
     </thead>
@@ -35,15 +74,16 @@
         }
     </tbody>
 </table>
-
-<!-- Second grid with test drives -->
+</div>
+<br>
+<div class="containerTD">
 <h3> TestDrives </h3>
         <table class="table" id="testDriveGrid">
             <thead>
                 <tr>
-                    <th>Customer ID</th>
-                    <th>Date of Test Drive</th>
-                    <th>Date of Query</th>
+                    <th>ИД на клиент</th>
+                    <th>Дата на тест драйв</th>
+                    <th>Дата на заявка</th>
                     
                     <th></th>
                 </tr>
@@ -62,13 +102,16 @@
             }
             </tbody>
         </table>
+        </div>
+        <br>
+        <div class="containerOrder">
         <h3> Orders </h3>
         <table class="table" id="ordersGrid">
             <thead>
                 <tr>
-                    <th>Order ID</th>
-                    <th>Total Sum</th>
-                    <th>Customer ID</th>
+                    <th>ИД на поръчка</th>
+                    <th>Обща сума</th>
+                    <th>ИД на клиент</th>
                     <th></th>
                 </tr>
             </thead>
@@ -85,9 +128,10 @@
             }
             </tbody>
         </table>
-        <button id="exportButton">Export to XML</button>
+        </div>
+        <button id="exportButton" class="btn">Експорт в XML</button>
 
-        <button id="exportButton">Export to Excel</button>
+        <button id="exportButtonExcel" class="btn">Експорт в Excel</button>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
@@ -127,7 +171,7 @@
             });
             $("#exportButton").click(function () {
             // Trigger the export action
-            window.location.href = "/Car/ExportToExcel";
+            window.location.href = "/Car/ExportToXml";
         });
             $(document).ready(function () {
                 // Capture click event on car row
@@ -173,36 +217,51 @@
 });
 function exportToXML() {
   // Create a new XML document
-  var xmlDoc = document.implementation.createDocument(null, "testDrives");
+  var xmlDoc = document.implementation.createDocument(null, "orders");
 
-  // Get the table rows in the second grid
-  var rows = $("#testDriveGrid tbody tr");
+  // Get the table rows in the order table
+  var rows = $("#orderReportTable tbody tr");
 
   // Iterate through the rows and extract the data
   rows.each(function(index) {
     var row = $(this);
-    var testDrive = xmlDoc.createElement("testDrive");
+    var order = xmlDoc.createElement("order");
 
     // Extract the data from the row
-    var dateOfTestDrive = row.find("td:nth-child(1)").text();
-    var dateOfQuery = row.find("td:nth-child(2)").text();
-    var customerId = row.find("td:nth-child(3)").text();
+    var orderId = row.find("td:nth-child(1)").text();
+    var originalPrice = row.find("td:nth-child(2)").text();
+    var totalSum = row.find("td:nth-child(3)").text();
+    var quantity = row.find("td:nth-child(4)").text();
+    var carId = row.find("td:nth-child(5)").text();
+    var customerId = row.find("td:nth-child(6)").text();
 
-    // Create XML elements and append them to the testDrive element
-    var dateOfTestDriveElement = xmlDoc.createElement("dateOfTestDrive");
-    dateOfTestDriveElement.textContent = dateOfTestDrive;
-    testDrive.appendChild(dateOfTestDriveElement);
+    // Create XML elements and append them to the order element
+    var orderIdElement = xmlDoc.createElement("orderId");
+    orderIdElement.textContent = orderId;
+    order.appendChild(orderIdElement);
 
-    var dateOfQueryElement = xmlDoc.createElement("dateOfQuery");
-    dateOfQueryElement.textContent = dateOfQuery;
-    testDrive.appendChild(dateOfQueryElement);
+    var originalPriceElement = xmlDoc.createElement("originalPrice");
+    originalPriceElement.textContent = originalPrice;
+    order.appendChild(originalPriceElement);
+
+    var totalSumElement = xmlDoc.createElement("totalSum");
+    totalSumElement.textContent = totalSum;
+    order.appendChild(totalSumElement);
+
+    var quantityElement = xmlDoc.createElement("quantity");
+    quantityElement.textContent = quantity;
+    order.appendChild(quantityElement);
+
+    var carIdElement = xmlDoc.createElement("carId");
+    carIdElement.textContent = carId;
+    order.appendChild(carIdElement);
 
     var customerIdElement = xmlDoc.createElement("customerId");
     customerIdElement.textContent = customerId;
-    testDrive.appendChild(customerIdElement);
+    order.appendChild(customerIdElement);
 
-    // Append the testDrive element to the root of the XML document
-    xmlDoc.documentElement.appendChild(testDrive);
+    // Append the order element to the root of the XML document
+    xmlDoc.documentElement.appendChild(order);
   });
 
   // Serialize the XML document to a string
@@ -211,4 +270,16 @@ function exportToXML() {
   // Log the XML string (you can replace this with your desired export logic)
   console.log(xmlString);
 }
+$(document).ready(function() {
+  $("#exportButtonExcel").click(function() {
+    // Call a function to export the data to Excel
+    exportToExcel();
+  });
+});
+
+function exportToExcel() {
+  // Trigger the export action by redirecting to the server endpoint
+  window.location.href = "/Car/ExportToExcel";
+}
         </script>
+        </body>

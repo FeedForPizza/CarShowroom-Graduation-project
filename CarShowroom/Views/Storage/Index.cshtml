@@ -4,12 +4,13 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
+<body>
+    <div class="containerCreateCar">
+<h2>Налични коли на склад</h2>
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -18,6 +19,10 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.YearOfManufacture)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.Car.Model)
             </th>
             <th></th>
         </tr>
@@ -31,12 +36,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.YearOfManufacture)
             </td>
+            
             <td>
-                <a asp-action="Edit" asp-route-id="@item.StorageId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.StorageId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.StorageId">Delete</a>
+                @Html.DisplayFor(modelItem => item.Car.Model)
             </td>
+            
         </tr>
 }
     </tbody>
 </table>
+</div>
+</body>

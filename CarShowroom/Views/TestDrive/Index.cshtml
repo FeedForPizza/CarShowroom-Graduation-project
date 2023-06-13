@@ -4,17 +4,24 @@
 	ViewData["Title"] = "Index";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
 <body>
-	<h1>Index</h1>
+    <div class="containerCreateCar">
+
+	<br>
+
+	<h2>Тест драйв</h2>
 
 	<form id="searchForm" method="get">
-		@Html.DropDownList("CarId", ViewBag.CustomerOptions as SelectList, "Select Model", new { @class = "form-control", id = "carId" })
-		<input type="text" name="startDate" id="startDate" placeholder="Start Date" />
-		<input type="text" name="endDate" id="endDate" placeholder="End Date" />
-		<button type="submit">Search</button>
+		@Html.DropDownList("CarId", ViewBag.CustomerOptions as SelectList, "Моля изберете кола", new { @class = "form-control", id = "carId" })
+		
+		<input type="text" name="startDate" id="startDate" placeholder="Първа дата" />
+		<input type="text" name="endDate" id="endDate" placeholder="Втора дата" />
+		<button type="submit" class="btn">Търси</button>
 
-		<button id="clearSearch">Clear</button>
+		<button id="clearSearch" class="btn">Изчистване на критериите</button>
 	</form>
 
 	<table class="table" id="tdTable">
@@ -52,14 +59,16 @@
 						@Html.DisplayFor(modelItem => item.DateOfQuery)
 					</td>
 					<td>
-						<a href="/TestDrive/Edit/@item.TestDriveId">Edit</a> |
-						<a href="/TestDrive/Details/@item.TestDriveId">Details</a> |
-						<a href="/TestDrive/Delete/@item.TestDriveId">Delete</a>
+						<a href="@Url.Action("Edit", new { id = item.TestDriveId })" class="btnDDE">Промени</a>|
+                <a href="@Url.Action("Delete", new { id = item.TestDriveId })" class="btnDDE">Детайли</a>|
+                <a href="@Url.Action("Details", new { id = item.TestDriveId })" class="btnDelete">Изтрий</a>
 					</td>
 				</tr>
 			}
 		</tbody>
 	</table>
+	</div>
+
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
@@ -116,11 +125,19 @@ $(".sortable").click(function() {
 
       $.each(result, function(index, item) {
         var row = $("<tr>");
-        row.append($("<td>").text(item.carId));
-        row.append($("<td>").text(item.customerId));
-        row.append($("<td>").text(moment(item.dateOfTestDrive).format("DD-MM-YYYY HH:mm")));
-        row.append($("<td>").text(moment(item.dateOfQuery).format("DD-MM-YYYY HH:mm")));
-        row.append($("<td>"));
+  row.append($("<td>").text(item.carId));
+  row.append($("<td>").text(item.customerId));
+  row.append($("<td>").text(moment(item.dateOfTestDrive).format("DD-MM-YYYY HH:mm")));
+  row.append($("<td>").text(moment(item.dateOfQuery).format("DD-MM-YYYY HH:mm")));
+  
+  var actions = $('<td>');
+  actions.append('<a href="/TestDrive/Edit/' + item.testDriveId + '" class="btnDDE">Промени</a> |');
+  actions.append('<a href="/TestDrive/Details/' + item.testDriveId + '" class="btnDDE">Детайли</a> |');
+  actions.append('<a href="/TestDrive/Delete/' + item.testDriveId + '" class="btnDelete">Изтрий</a>');
+  
+  row.append(actions);
+
+        
         $("#tdTable tbody").append(row);
       });
     },
@@ -129,6 +146,9 @@ $(".sortable").click(function() {
     }
   });
 });
+
+
+
 				 $("#searchForm").submit(function (event) {
 				event.preventDefault(); // Prevent the default form submission
 
@@ -151,17 +171,22 @@ $(".sortable").click(function() {
                             // Iterate through the test drives and construct HTML markup for the rows
                             $.each(result, function (index, item) {
                         var row = $("<tr>");
-
-						row.append($("<td>").text(item.carId));
-                        row.append($("<td>").text(item.customerId));
-                        row.append($("<td>").text(moment(item.dateOfTestDrive).format("DD-MM-YYYY HH:mm")));
-    row.append($("<td>").text(moment(item.dateOfQuery).format("DD-MM-YYYY HH:mm")));
-                        row.append($("<td>"));
-                        $("#tdTable tbody").append(row);
+  row.append($("<td>").text(item.carId));
+  row.append($("<td>").text(item.customerId));
+  row.append($("<td>").text(moment(item.dateOfTestDrive).format("DD-MM-YYYY HH:mm")));
+  row.append($("<td>").text(moment(item.dateOfQuery).format("DD-MM-YYYY HH:mm")));
+  
+  var actions = $('<td>');
+  actions.append('<a href="/TestDrive/Edit/' + item.testDriveId + '" class="btnDDE">Промени</a> |');
+  actions.append('<a href="/TestDrive/Details/' + item.testDriveId + '" class="btnDDE">Детайли</a> |');
+  actions.append('<a href="/TestDrive/Delete/' + item.testDriveId + '" class="btnDelete">Изтрий</a>');
+  
+  row.append(actions);
+  $("#tdTable tbody").append(row);
                     });
 
                             // Update the second grid with the constructed rows
-                            $("#tdTable tbody").html(rows);
+                            
                         },
 					error: function (error) {
 						console.log(error);
@@ -169,11 +194,16 @@ $(".sortable").click(function() {
 				});
 			});
 		});
-		$("#clearSearch").click(function() {
+
+
+	$("#clearSearch").click(function() {
   // Clear the search parameters
   $("#carId").val("");
   $("#startDate").val("");
   $("#endDate").val("");
+
+  // Clear the table by emptying the tbody
+  $("#tdTable tbody").empty();
 
   // Perform the search using AJAX without any filters
   $.ajax({
@@ -181,6 +211,7 @@ $(".sortable").click(function() {
     type: "GET",
     dataType: "json",
     success: function(result) {
+      // Clear the table before adding new rows
       $("#tdTable tbody").empty();
 
       $.each(result, function(index, item) {
@@ -189,7 +220,14 @@ $(".sortable").click(function() {
         row.append($("<td>").text(item.customerId));
         row.append($("<td>").text(moment(item.dateOfTestDrive).format("DD-MM-YYYY HH:mm")));
         row.append($("<td>").text(moment(item.dateOfQuery).format("DD-MM-YYYY HH:mm")));
-        row.append($("<td>"));
+
+        var actions = $('<td>');
+        actions.append('<a href="/TestDrive/Edit/' + item.testDriveId + '" class="btnDDE">Промени</a> |');
+        actions.append('<a href="/TestDrive/Details/' + item.testDriveId + '" class="btnDDE" >Детайли</a> |');
+        actions.append('<a href="/TestDrive/Delete/' + item.testDriveId + '" class="btnDelete">Изтрий</a>');
+
+        row.append(actions);
+
         $("#tdTable tbody").append(row);
       });
     },
@@ -199,6 +237,6 @@ $(".sortable").click(function() {
   });
 });
 
-
 	</script>
+	
 </body>

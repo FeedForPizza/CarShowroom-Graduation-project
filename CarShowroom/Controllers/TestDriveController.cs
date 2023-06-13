@@ -18,19 +18,11 @@ namespace CarShowroom.Controllers
 
         public IActionResult Index()
         {
-            var td = carShowroomContext.TestDrives
-    .Select(t => new
-    {
-        t.CarId,
-        t.CustomerId,
-        t.DateOfTestDrive,
-        t.DateOfQuery
-    })
-    .ToList();
+            var td = carShowroomContext.TestDrives.ToList();
             var cars = carShowroomContext.Cars.ToList();
             ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
             return View("Index", td);
-            
+
         }
         [HttpGet]
         public ActionResult SearchMethod(int? carId, DateTime? startDate, DateTime? endDate, string sortColumn, string sortDirection)
@@ -68,69 +60,112 @@ namespace CarShowroom.Controllers
             return Json(result);
         }
 
-        
+
         [HttpGet]
         public async Task<ActionResult> Details(int id)
         {
             var td = await carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == id);
-            
+
             return View("Details", td);
         }
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var td = await carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == id);
+            var td = await carShowroomContext.TestDrives
+    .Include(x => x.Car)
+    .Include(x => x.Customer)
+    .FirstOrDefaultAsync(x => x.TestDriveId == id);
             var cars = carShowroomContext.Cars.ToList();
             ViewBag.CustomerOptions = new SelectList(cars, "CarId", "Model");
             if (td != null)
             {
-                var tds = new TestDrive()
+                // Test drive found, proceed with your logic
+                var testDrive = new TestDrive()
                 {
-                    TestDriveId = td.TestDriveId,
                     DateOfTestDrive = td.DateOfTestDrive,
                     DateOfQuery = td.DateOfQuery,
                     CarId = td.CarId,
                     CustomerId = td.CustomerId
-
                 };
-                
 
-            };
+                // ... other code ...
 
-            return View("Edit", td);
-            
+                return View("Edit", td);
+            }
+            else
+            {
+                // Test drive not found, handle the scenario (e.g., display an error message or redirect to a different page)
+                return NotFound();
+            }
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(TestDrive testDrive,int selectedCarId)
+        public async Task<IActionResult> Edit(TestDrive testDrive)
         {
-            
-            var td = await carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == testDrive.TestDriveId);
+            var td = await carShowroomContext.TestDrives
+    .Include(y => y.Car)
+    .Include(y => y.Customer)
+    .FirstOrDefaultAsync(x => x.TestDriveId == testDrive.TestDriveId);
+
             if (td != null)
             {
-                td.TestDriveId = testDrive.TestDriveId;
-                td.DateOfTestDrive = testDrive.DateOfTestDrive;
-                td.DateOfQuery = DateTime.Now;
-                td.CarId = selectedCarId;
-                td.CustomerId = testDrive.CustomerId;
-                td.Customer.FirstName = testDrive.Customer.FirstName;
-                td.Customer.MiddleName = testDrive.Customer.MiddleName;
-                td.Customer.LastName = testDrive.Customer.LastName;
-                td.Customer.Phone = testDrive.Customer.Phone;
-                td.Customer.Address = testDrive.Customer.Address;
-                await carShowroomContext.SaveChangesAsync();
+                // Проверка на последна модификация
+                if (td.Modified19118133 < DateTime.Now)
+                {
+                    td.DateOfTestDrive = testDrive.DateOfTestDrive;
+                    td.DateOfQuery = testDrive.DateOfQuery;
+                    td.CarId = testDrive.CarId;
+                    td.Customer.FirstName = testDrive.Customer.FirstName;
+                    td.Customer.MiddleName = testDrive.Customer.MiddleName;
+                    td.Customer.LastName = testDrive.Customer.LastName;
+                    td.Customer.Phone = testDrive.Customer.Phone;
+                    td.Customer.Address = testDrive.Customer.Address;
+                    td.Modified19118133 = DateTime.Now;
 
+                    await carShowroomContext.SaveChangesAsync();
+                    return RedirectToAction("Details", new { id = testDrive.TestDriveId });
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Възникна конфликт. Редът е бил променен от друг потребител.";
+                    return RedirectToAction("Edit", new { id = testDrive.TestDriveId });
+                }
             }
-            return View("Details");
+            else
+            {
+                TempData["ErrorMessage"] = "Неуспешно редактиране на данните. Опитайте отново, колега/колежке.";
+                return RedirectToAction("Edit", new { id = testDrive.TestDriveId });
+            }
+
         }
-        public async Task<IActionResult> Delete(TestDrive testDrive)
+        
+        public async Task<IActionResult> Delete(int id)
         {
-            var td = await carShowroomContext.TestDrives.FindAsync(testDrive.TestDriveId);
-            if (td != null)
+            var order = await carShowroomContext.TestDrives.Include(x => x.Car).Include(x => x.Customer).FirstOrDefaultAsync(x => x.TestDriveId == id);
+            if (order != null)
+            {
+                return View("Delete",order);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+        
+        public async Task<IActionResult> DeleteConfirmation(int id)
+        {
+            var testDrive = await carShowroomContext.TestDrives.FindAsync(id);
+            if (testDrive != null)
             {
                 carShowroomContext.TestDrives.Remove(testDrive);
                 await carShowroomContext.SaveChangesAsync();
+
+                return RedirectToAction("Index");
             }
-            return View("Index");
+            else
+            {
+                TempData["ErrorMessage"] = "Неуспешно изтриване на данните. Опитайте отново, колега/колежке.";
+                return RedirectToAction("Details", new { id = testDrive.TestDriveId });
+            }
         }
         [HttpGet]
         public ActionResult Create()
@@ -140,18 +175,19 @@ namespace CarShowroom.Controllers
             return View("Create");
         }
         [HttpPost]
-        public async Task<IActionResult> ProcessCreate(TestDrive testDrive,Customer customer)
+        public async Task<IActionResult> ProcessCreate(TestDrive testDrive, Customer customer)
         {
-            
+
 
             var cust = new Customer()
             {
-                
+
                 FirstName = customer.FirstName,
                 MiddleName = customer.MiddleName,
                 LastName = customer.LastName,
                 Address = customer.Address,
-                Phone = customer.Phone
+                Phone = customer.Phone,
+                Modified19118133 = DateTime.Now
             };
             await carShowroomContext.Customers.AddAsync(cust);
             await carShowroomContext.SaveChangesAsync();
@@ -161,14 +197,24 @@ namespace CarShowroom.Controllers
                 CarId = testDrive.CarId,
                 DateOfTestDrive = testDrive.DateOfTestDrive,
                 DateOfQuery = DateTime.Now,
-                CustomerId = customerId
+                CustomerId = customerId,
+                Modified19118133 = DateTime.Now
             };
 
             await carShowroomContext.TestDrives.AddAsync(td);
             await carShowroomContext.SaveChangesAsync();
-           
-            return View("Details");
+            if (td.TestDriveId > 0)
+            {
+
+                return RedirectToAction("Details", new { id = td.TestDriveId });
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Поради грешка вашият час за тест драйв не беше запазен. Моля опитайте отново.";
+                return RedirectToAction("Create");
+            }
+            
         }
-        
+
     }
 }

@@ -5,6 +5,8 @@ using CarShowroom.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace CarShowroom.Controllers
@@ -85,7 +87,8 @@ namespace CarShowroom.Controllers
             var testDrives = carShowroomContext.Orders.Where(td => td.CarId == carId).ToList();
             return Json(testDrives);
         }
-        public IActionResult ExportToExcel()
+        [HttpGet]
+        public void ExportToExcel()
         {
             // Fetch the data from the second grid
             var testDrives = carShowroomContext.TestDrives.ToList();
@@ -96,36 +99,45 @@ namespace CarShowroom.Controllers
                 // Create the worksheet
                 ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test Drives");
 
-                // Set the column headers
-                worksheet.Cells[1, 1].Value = "Date of Test Drive";
-                worksheet.Cells[1, 2].Value = "Date of Query";
-                worksheet.Cells[1, 3].Value = "Customer ID";
+                worksheet.Cells[1, 1].Value = "TestDriveID";
+                worksheet.Cells[1, 2].Value = "Date of Test Drive";
+                worksheet.Cells[1, 3].Value = "Date of Query";
+                worksheet.Cells[1, 4].Value = "Customer ID";
+
+                // Apply styling to the header cells
+                using (var headerCells = worksheet.Cells[1, 1, 1, 4])
+                {
+                    headerCells.Style.Font.Bold = true;
+                    headerCells.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    headerCells.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                }
 
                 // Set the data rows
                 int row = 2;
                 foreach (var testDrive in testDrives)
                 {
-                    worksheet.Cells[row, 1].Value = testDrive.DateOfTestDrive;
-                    worksheet.Cells[row, 2].Value = testDrive.DateOfQuery;
-                    worksheet.Cells[row, 3].Value = testDrive.CustomerId;
+                    worksheet.Cells[row, 1].Value = testDrive.TestDriveId;
+                    worksheet.Cells[row, 2].Value = testDrive.DateOfTestDrive;
+                    worksheet.Cells[row, 2].Style.Numberformat.Format = "mm/dd/yyyy hh:mm";
+                    worksheet.Cells[row, 3].Value = testDrive.DateOfQuery;
+                    worksheet.Cells[row, 3].Style.Numberformat.Format = "mm/dd/yyyy hh:mm";
+                    worksheet.Cells[row, 4].Value = testDrive.CustomerId;
                     row++;
                 }
 
                 // Auto-fit the columns
                 worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
-
+                Response.Clear();
                 // Set the content type and header for the response
                 Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                Response.Headers.Add("content-disposition", "attachment;  filename=testDrives.xlsx");
+                Response.Headers.Add("content-disposition", "attachment:  filename=testDrives.xlsx");
 
                 // Write the Excel package to the response stream
-                Response.Body.Write(package.GetAsByteArray());
-
-                // End the response
-                Response.CompleteAsync();
+                Response.Body.WriteAsync(package.GetAsByteArray());
+                
             }
 
-            return Ok();
+            
         }
         [HttpGet]
         public IActionResult ExportToXml()
@@ -133,27 +145,40 @@ namespace CarShowroom.Controllers
             var cars = carShowroomContext.Cars.Include(c => c.TestDrives).ToList();
 
             // Create an XML document
-            var xmlDoc = new XDocument();
-            var rootElement = new XElement("testDrives");
+            var xmlDoc = new XmlDocument();
+            var rootElement = xmlDoc.CreateElement("testDrives");
 
             // Iterate through the cars and test drives and add them to the XML document
             foreach (var car in cars)
             {
                 foreach (var testDrive in car.TestDrives)
                 {
-                    var testDriveElement = new XElement("testDrive",
-                        new XElement("dateOfTestDrive", testDrive.DateOfTestDrive),
-                        new XElement("dateOfQuery", testDrive.DateOfQuery),
-                        new XElement("customerId", testDrive.CustomerId)
-                    );
-                    rootElement.Add(testDriveElement);
+                    var testDriveElement = xmlDoc.CreateElement("testDrive");
+
+                    var dateOfTestDriveElement = xmlDoc.CreateElement("dateOfTestDrive");
+                    dateOfTestDriveElement.InnerText = testDrive.DateOfTestDrive.ToString();
+                    testDriveElement.AppendChild(dateOfTestDriveElement);
+
+                    var dateOfQueryElement = xmlDoc.CreateElement("dateOfQuery");
+                    dateOfQueryElement.InnerText = testDrive.DateOfQuery.ToString();
+                    testDriveElement.AppendChild(dateOfQueryElement);
+
+                    var customerIdElement = xmlDoc.CreateElement("customerId");
+                    customerIdElement.InnerText = testDrive.CustomerId.ToString();
+                    testDriveElement.AppendChild(customerIdElement);
+
+                    var carIdElement = xmlDoc.CreateElement("carId");
+                    carIdElement.InnerText = testDrive.CarId.ToString();
+                    testDriveElement.AppendChild(carIdElement);
+
+                    rootElement.AppendChild(testDriveElement);
                 }
             }
 
-            xmlDoc.Add(rootElement);
+            xmlDoc.AppendChild(rootElement);
 
             // Set the response content type to "application/xml"
-            Response.ContentType = "application/xml";
+            Response.ContentType = "text/xml";
 
             // Set the file name and content disposition header for the download
             var fileName = "testDrives.xml";
@@ -172,42 +197,75 @@ namespace CarShowroom.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Car car)
         {
-            var cars = await carShowroomContext.Cars.FindAsync(car.CarId);
-            if(cars != null)
+            var existingCar = await carShowroomContext.Cars.FindAsync(car.CarId);
+            if (existingCar != null)
             {
-                cars.CarId = car.CarId;
-                cars.Model = car.Model;
-                cars.Hp = car.Hp;
-                cars.MaxSpeed = car.MaxSpeed;
-                cars.MinSpeed = car.MinSpeed;
-                cars.TypeFuel = car.TypeFuel;
-                cars.Capacity = car.Capacity;
-                cars.TypeEngine = car.TypeEngine;
-                cars.NumberOfSeats = car.NumberOfSeats;
-                cars.Height = car.Height;
-                cars.Weight = car.Weight;
-                cars.AverageExpenseTown = car.AverageExpenseTown;
-                cars.AverageExpenseOnroad = car.AverageExpenseOnroad;
-                cars.AverageExpenseCombined = car.AverageExpenseCombined;
-                cars.YearOfManufacure = car.YearOfManufacure;
-                cars.Doors = car.Doors;
-                cars.TypeCompartment = car.TypeCompartment;
-                cars.OriginalPrice = car.OriginalPrice;
-                cars.PictureUrl = car.PictureUrl;
-                await carShowroomContext.SaveChangesAsync();
-            }
+                // Проверка на последна модификация
+                if (existingCar.Modified19118133 < DateTime.Now)
+                {
+                    existingCar.CarId = car.CarId;
+                    existingCar.Model = car.Model;
+                    existingCar.Hp = car.Hp;
+                    existingCar.MaxSpeed = car.MaxSpeed;
+                    existingCar.MinSpeed = car.MinSpeed;
+                    existingCar.TypeFuel = car.TypeFuel;
+                    existingCar.Capacity = car.Capacity;
+                    existingCar.TypeEngine = car.TypeEngine;
+                    existingCar.NumberOfSeats = car.NumberOfSeats;
+                    existingCar.Height = car.Height;
+                    existingCar.Weight = car.Weight;
+                    existingCar.AverageExpenseTown = car.AverageExpenseTown;
+                    existingCar.AverageExpenseOnroad = car.AverageExpenseOnroad;
+                    existingCar.AverageExpenseCombined = car.AverageExpenseCombined;
+                    existingCar.YearOfManufacure = car.YearOfManufacure;
+                    existingCar.Doors = car.Doors;
+                    existingCar.TypeCompartment = car.TypeCompartment;
+                    existingCar.OriginalPrice = car.OriginalPrice;
+                    existingCar.PictureUrl = car.PictureUrl;
+                    existingCar.Modified19118133 = DateTime.Now;
 
-            return View("Details",car);
-        }
-        public async Task<IActionResult> Delete(Car car)
-        {
-            var cars = await carShowroomContext.Cars.FindAsync(car.CarId);
-            if(cars != null)
-            {
-                carShowroomContext.Cars.Remove(car);
-                await carShowroomContext.SaveChangesAsync();
+                    await carShowroomContext.SaveChangesAsync();
+                    return RedirectToAction("Details", new { id = car.CarId });
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Възникна конфликт. Редът е бил променен от друг потребител.";
+                    return RedirectToAction("Edit", new { id = car.CarId });
+                }
             }
-            return View("Index");
+            else
+            {
+                TempData["ErrorMessage"] = "Неуспешно редактиране на данните. Опитайте отново, колега/колежке.";
+                return RedirectToAction("Edit", new { id = car.CarId });
+            }
+        }
+        public async Task<IActionResult> Delete(int id)
+        {
+            var order = await carShowroomContext.Cars.FindAsync(id);
+            if (order != null)
+            {
+                return View("Delete", order);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+        public async Task<IActionResult> DeleteConfirmation(int id)
+        {
+            var cars = await carShowroomContext.Cars.FindAsync(id);
+            if (cars != null)
+            {
+                carShowroomContext.Cars.Remove(cars);
+                await carShowroomContext.SaveChangesAsync();
+
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Неуспешно изтриване на данните. Опитайте отново, колега/колежке.";
+                return RedirectToAction("Details", new { id = cars.CarId });
+            }
         }
         [HttpGet]
         public ActionResult Create()
@@ -219,7 +277,7 @@ namespace CarShowroom.Controllers
         {
             var cars = new Car()
             {
-                CarId = car.CarId,
+                
                 Model = car.Model,
                 Hp = car.Hp,
                 MaxSpeed = car.MaxSpeed,
@@ -237,12 +295,22 @@ namespace CarShowroom.Controllers
                 Doors = car.Doors,
                 TypeCompartment = car.TypeCompartment,
                 OriginalPrice = car.OriginalPrice,
-                PictureUrl = car.PictureUrl
+                PictureUrl = car.PictureUrl,
+                Modified19118133 = DateTime.Now
             };
             await carShowroomContext.Cars.AddAsync(cars);
             await carShowroomContext.SaveChangesAsync();
-            ViewBag.Message = "Car created SUCCESFULLY!";
-            return View("Details");
+            if (cars.CarId > 0)
+            {
+                
+                return RedirectToAction("Details", new { id = cars.CarId });
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Колата не беше създадена и добавена в списъка с коли. Опитайте отново.";
+                return RedirectToAction("Create");
+            }
+            
         }
 
     }

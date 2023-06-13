@@ -1,0 +1,119 @@
+﻿@model CarShowroom.Entities.Extra
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<style>
+    body {
+        background-color: rgba(45, 89, 134, 0.8);
+    }
+    h2{
+        text-align: center;
+    }
+	.containerCreateCar{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+.btnDelete {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color: rgb(204, 0, 0);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.btnDelete:hover {
+    background-color:rgb(204, 0, 0,0.3);
+}
+	.btn {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+
+.btn:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+</style>
+
+<body>
+<div class="containerCreateCar">
+<h2>Създаване на екстра</h2>
+
+<h4>Екстра</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ProcessCreate">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="ExtraName" class="control-label"></label>
+                <input asp-for="ExtraName" class="form-control" />
+                <span asp-validation-for="ExtraName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="button-container">
+            <div class="form-group">
+                <input type="submit" value="Създай" class="btn" />
+            </div>
+            
+    <a href="@Url.Action("Index", "Extra")"  class="btnBackToMain">Към списък с екстри</a>
+</div>
+        </form>
+    </div>
+</div>
+
+
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+</body>

@@ -9,6 +9,7 @@ public partial class CarExtra
     public int CarId { get; set; }
 
     public int ExtraId { get; set; }
+    public DateTime Modified19118133 { get; set; }
 
     public virtual Car Car { get; set; } = null!;
 

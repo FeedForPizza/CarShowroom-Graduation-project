@@ -4,20 +4,20 @@
 	ViewData["Title"] = "Create";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<style>
-	.column {
-		float: left;
-		width: 33%;
-	}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
 
-	body {
-	}
-</style>
 <body>
-	<
-	<h1>Create</h1>
+    <div class="containerCreateCar">
 
-	<h4>Order</h4>
+	<h2>Създаване на поръчка</h2>
+
+	<h4>Поръчка</h4>
 	<hr />
 	<form asp-action="CreateProcess" method="post">
 		<div class="row">
@@ -28,25 +28,26 @@
 					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 					<div class="form-group">
-						
-							@Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Select Model", new{@class = "form-control", id = "Car"})
-						
+
+						@Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Моля изберете кола", new{@class = "form-control", id = "Car", required = "required"})
+</div>
 						<div class="form-group">
 
 							<span id="original-price"></span>
+							<input type="hidden" name="originalPrice" id="original-price-input"/>
 							<span asp-validation-for="OriginalPrice" class="text-danger"></span>
 						</div>
 
 						<div class="form-group">
 							<label asp-for="Quantity" class="control-label">Количество</label>
-							<input asp-for="Quantity" class="form-control" id="quantity-input" />
+							<input asp-for="Quantity" class="form-control" id="quantity-input" required />
 							<span asp-validation-for="Quantity" class="text-danger"></span>
 						</div>
 
 
 
 
-					</div>
+					
 
 
 				</div>
@@ -85,7 +86,7 @@
 				<div class="form-group">
 					<label> Confirmation Email: </label>
 					<input name="email" required class="form-control" />
-					
+
 				</div>
 
 			</div>
@@ -100,11 +101,11 @@
 					@foreach (var extra in ViewBag.ExtrasOptions)
 					{
 						<div id="extra-@extra.ExtraId">
-						<label><input type="checkbox" name="extras[@e].IsChecked" value="true" />@extra.ExtraName</label>
-						<br />
-						<input type="hidden" name="extras[@(e++)].ExtraId" value="@extra.ExtraId" />
-						
-					</div>
+							<label><input type="checkbox" name="extras[@e].IsChecked" value="true" />@extra.ExtraName</label>
+							<br />
+							<input type="hidden" name="extras[@(e++)].ExtraId" value="@extra.ExtraId" />
+
+						</div>
 					}
 				</fieldset>
 				<br>
@@ -112,16 +113,19 @@
 					<input type="hidden" asp-for="TotalSum" id="total-sum-input" />
 					<label><span id="total-price"></span></label>
 				</div>
-
+				<br>
 				<div class="form-group">
-					<input type="submit" value="Create" class="btn btn-primary " />
+					<input type="submit" value="Създай" class="btn" />
 				</div>
+				<br>
 			</div>
 		</div>
 	</form>
 	<div>
-		<a asp-action="Index">Back to List</a>
+<a href="@Url.Action("Index", "Home")"  class="btnBackToMain">Към начална страница</a>
 	</div>
+	
+</div>
 </body>
 @section Scripts {
     @{
@@ -130,91 +134,91 @@
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-		function calculatePrice() {
-			var carId = document.getElementById("Car");
-			var selectedCar = carId.value;
-			var quantity = $('#quantity-input').val();
-			var selectedExtras  = [];
-			
+			function calculatePrice() {
+				var carId = document.getElementById("Car");
+				var selectedCar = carId.value;
+				var quantity = $('#quantity-input').val();
+				var selectedExtras  = [];
 
-			$('div[id^=extra-] input[name^=extras]:checked').each(function() {
-    var extraId = $(this).closest('div').attr('id').match(/\d+/)[0];
-    selectedExtras.push({ ExtraId: extraId, IsChecked: true });
-    console.log(extraId)
-  });
-			
-			$.ajax({
-				url: '/Order/CalculatePrice',
-				type: 'POST',
-				data: { carId: selectedCar, quantity: quantity, extra: selectedExtras   },
-				success: function(data, status, jqXHR) {
-					var price = data.price;
-					$('#total-price').text('Total price: ' + price);
-					$('#total-sum-input').val(price);
-					 var totalSum = 0;
-    if (price && typeof price === 'string' && price.match(/\d+/)) {
-        totalSum = parseInt(price.match(/\d+/)[0]);
-    }
-    
-					$('#total-sum').text(totalSum);
-					if (data.errorMessage) {
-        console.error(data.errorMessage);
-        return;
-    }
-				},
-				error: function(jqXHR, status, error) {
-					$('#total-price').text('Error calculating price');
-				}
-			});
+
+				$('div[id^=extra-] input[name^=extras]:checked').each(function() {
+		var extraId = $(this).closest('div').attr('id').match(/\d+/)[0];
+		selectedExtras.push({ ExtraId: extraId, IsChecked: true });
+		console.log(extraId)
+	  });
+
+				$.ajax({
+					url: '/Order/CalculatePrice',
+					type: 'POST',
+					data: { carId: selectedCar, quantity: quantity, extra: selectedExtras   },
+					success: function(data, status, jqXHR) {
+						var price = data.price;
+						$('#total-price').text('Total price: ' + price);
+						$('#total-sum-input').val(price);
+						 var totalSum = 0;
+		if (price && typeof price === 'string' && price.match(/\d+/)) {
+			totalSum = parseInt(price.match(/\d+/)[0]);
 		}
 
-		function updateOriginalPrice() {
-			console.log("JS code running");
-			var carId = document.getElementById("Car");
-			var selectedCar = carId.value;
-			console.log(selectedCar)
-			$.ajax({
-				url: "/Order/GetCarPrice",
-				type: "GET",
-				data: {
-					carId: selectedCar
-				},
-				success: function(data, status, jqXHR) {
-					 if (data.errorMessage) {
-        console.error(data.errorMessage);
-        return;
-    }
-					var originalPrice = data.ogPrice;
-					$("#original-price").text("Original Price: $" + originalPrice);
-				},
-				error: function(jqXHR, status, error) {
-					console.error(error);
+						$('#total-sum').text(totalSum);
+						if (data.errorMessage) {
+			console.error(data.errorMessage);
+			return;
+		}
+					},
+					error: function(jqXHR, status, error) {
+						$('#total-price').text('Error calculating price');
 					}
 				});
 			}
-			$.ajax({
-    url: "/Order/CreateProcess",
-    type: "POST",
-    data: {
-        originalPrice: originalPrice,
-        // other data properties
-    },
-});
-			$(document).ready(function() {
-				// Call updateOriginalPrice when the page loads
-				updateOriginalPrice();
 
-				// Call updateOriginalPrice whenever the car selection changes
-				$("#Car").on("input", function() {
-					updateOriginalPrice();
+			function updateOriginalPrice() {
+				console.log("JS code running");
+				var carId = document.getElementById("Car");
+				var selectedCar = carId.value;
+				console.log(selectedCar)
+				$.ajax({
+					url: "/Order/GetCarPrice",
+					type: "GET",
+					data: {
+						carId: selectedCar
+					},
+					success: function(data, status, jqXHR) {
+						 if (data.errorMessage) {
+			console.error(data.errorMessage);
+			return;
+					}
+						var originalPrice = data.ogPrice;
+						$("#original-price").text("Original Price: $" + originalPrice);
+						$("#original-price-input").val(originalPrice);
+					},
+					error: function(jqXHR, status, error) {
+						console.error(error);
+					}
 				});
+			}
+	//			$.ajax({
+	//	url: "/Order/CreateProcess",
+	//	type: "POST",
+	//	data: {
+	//		originalPrice: ("#original-price")
+	//	}
+	//});
+				$(document).ready(function() {
+					// Call updateOriginalPrice when the page loads
+					updateOriginalPrice();
 
-				// Call calculatePrice when the quantity or any extra changes
-				$('#quantity-input, input[name^=extras]').on('change', function() {
+					// Call updateOriginalPrice whenever the car selection changes
+					$("#Car").on("input", function() {
+						updateOriginalPrice();
+					});
+
+					// Call calculatePrice when the quantity or any extra changes
+					$('#quantity-input, input[name^=extras]').on('change', function() {
+						calculatePrice();
+					});
+
+					// Call calculatePrice when the page loads
 					calculatePrice();
 				});
-
-				// Call calculatePrice when the page loads
-				calculatePrice();
-			});
 </script>

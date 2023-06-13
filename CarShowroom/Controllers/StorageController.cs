@@ -1,5 +1,6 @@
 ﻿using CarShowroom.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarShowroom.Controllers
 {
@@ -14,7 +15,7 @@ namespace CarShowroom.Controllers
 
         public IActionResult Index()
         {
-            var storageItems = carShowroomContext.Storages.ToList();
+            var storageItems = carShowroomContext.Storages.Include(y=>y.Car).ToList();
             return View("Index",storageItems);
         }
         [HttpGet]

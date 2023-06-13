@@ -4,16 +4,94 @@
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<style>
+    body {
+        background-color: rgba(45, 89, 134, 0.8);
+    }
+    h2{
+        text-align: center;
+    }
+	.containerCreateCar{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+.btnDelete {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color: rgb(204, 0, 0);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.btnDelete:hover {
+    background-color:rgb(204, 0, 0,0.3);
+}
+	.btn {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
 
-<h1>Edit</h1>
+.btn:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.button-container {
+    display: flex;
+    gap: 10px;
+}
 
-<h4>Car</h4>
+</style>
+
+<body>
+    <div class="containerCreateCar">
+<h2>Редактиране</h2>
+
+<h4>Кола</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="CarId" />
+            <h4>Главна информация</h4>
+                    <hr />
             <div class="form-group">
                 <label asp-for="Model" class="control-label"></label>
                 <input asp-for="Model" class="form-control" />
@@ -54,6 +132,8 @@
                 <input asp-for="NumberOfSeats" class="form-control" />
                 <span asp-validation-for="NumberOfSeats" class="text-danger"></span>
             </div>
+            <h4>Допълнителна информация</h4>
+                    <hr />
             <div class="form-group">
                 <label asp-for="Height" class="control-label"></label>
                 <input asp-for="Height" class="form-control" />
@@ -104,17 +184,23 @@
                 <input asp-for="PictureUrl" class="form-control" />
                 <span asp-validation-for="PictureUrl" class="text-danger"></span>
             </div>
+<br>
+            <div class="button-container">
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Запази" class="btn" />
             </div>
+
+                <a href="@Url.Action("Index", "Car")"  class="btnBackToMain">Към списък с коли</a>
+            
+        </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
 </div>
-
+</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+</body>

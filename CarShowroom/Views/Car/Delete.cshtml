@@ -5,11 +5,83 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Delete</h1>
+<style>
+    body {
+        background-color: rgba(45, 89, 134, 0.8);
+    }
+    h2{
+        text-align: center;
+    }
+	.containerCreateCar{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+.btnDelete {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color: rgb(204, 0, 0);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.btnDelete:hover {
+    background-color:rgb(204, 0, 0,0.3);
+}
+	.btn {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Car</h4>
+.btn:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+</style>
+<body>
+<div class="containerCreateCar">
+<h2>Изтриване</h2>
+
+<h3>Сигурни ли сте, че искате да изтриете този елемент? </h3>
+
+    <h4>Кола</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -122,9 +194,8 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="CarId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+        <a href="@Url.Action("DeleteConfirmation", "Car", new { id = Model?.CarId})" class="btnDelete">Изтриване</a>
+        <a href="@Url.Action("Index", "Car")"  class="btnBackToMain">Към списък с коли</a>
+    
 </div>
+</body>

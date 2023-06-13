@@ -4,20 +4,91 @@
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<style>
+    body {
+        background-color: rgba(45, 89, 134, 0.8);
+    }
+    h2{
+        text-align: center;
+    }
+	.containerCreateCar{
+    background-color: white;
+    border-radius: 20px;
+    padding: 20px;
+	}
+.btnDelete {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color: rgb(204, 0, 0);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnBackToMain:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.btnDelete:hover {
+    background-color:rgb(204, 0, 0,0.3);
+}
+	.btn {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE {
+  display: inline-block;
+    padding: 5px 20px;
+    background-color:  rgba(45, 89, 134, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+.btnDDE:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
 
-<h1>Create</h1>
+.btn:hover {
+    background-color:rgb(198, 217, 236);
+    color: #404040;
+}
+.button-container {
+    display: flex;
+    gap: 10px;
+}
 
-<h4>Car</h4>
-<hr />
-<div class="row">
+</style>
+
+<body>
+    <br>
+<div class="row containerCreateCar">
+<h3 style="text-align: center">Създаване на нова кола</h3>
     <div class="col-md-4">
         <form asp-action="CreateProcess">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="CarId" class="control-label"></label>
-                <input asp-for="CarId" class="form-control" />
-                <span asp-validation-for="CarId" class="text-danger"></span>
-            </div>
+            <h4>Главна информация</h4>
+                    <hr />
+            <div class="column">
             <div class="form-group">
                 <label asp-for="Model" class="control-label"></label>
                 <input asp-for="Model" class="form-control" />
@@ -58,6 +129,9 @@
                 <input asp-for="NumberOfSeats" class="form-control" />
                 <span asp-validation-for="NumberOfSeats" class="text-danger"></span>
             </div>
+            </div>
+            <h4>Допълнителна информация</h4>
+                    <hr />
             <div class="form-group">
                 <label asp-for="Height" class="control-label"></label>
                 <input asp-for="Height" class="form-control" />
@@ -69,7 +143,7 @@
                 <span asp-validation-for="Weight" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="AverageExpenseTown" class="control-label"></label>
+                <label asp-for="AverageExpenseTown" class="control-label">Average Expense Town</label>
                 <input asp-for="AverageExpenseTown" class="form-control" />
                 <span asp-validation-for="AverageExpenseTown" class="text-danger"></span>
             </div>
@@ -85,7 +159,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="YearOfManufacure" class="control-label"></label>
-                <input asp-for="YearOfManufacure"  type="date" class="form-control" min="1900-01-01" max="2099-12-31" value="@Model.YearOfManufacure?.ToString("yyyy")"/>
+                <input asp-for="YearOfManufacure"  type="date" class="form-control"/>
                 <span asp-validation-for="YearOfManufacure" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -108,17 +182,21 @@
                 <input asp-for="PictureUrl" class="form-control" />
                 <span asp-validation-for="PictureUrl" class="text-danger"></span>
             </div>
+            <div class="button-container">
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Създай" class="btn" />
             </div>
+            
+    <a href="@Url.Action("Index", "Car")"  class="btnBackToMain">Към списък с коли</a>
+
+</div>
         </form>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
+
+</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+</body>

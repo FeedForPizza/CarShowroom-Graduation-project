@@ -1,146 +1,149 @@
 ﻿@model CarShowroom.Entities.Car
 
 @{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h1>Details</h1>
-
-<div>
-    <h4>Car</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Model)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Model)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Hp)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Hp)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaxSpeed)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaxSpeed)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MinSpeed)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MinSpeed)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TypeFuel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TypeFuel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Capacity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Capacity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TypeEngine)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TypeEngine)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NumberOfSeats)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NumberOfSeats)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Height)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Height)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Weight)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Weight)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AverageExpenseTown)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AverageExpenseTown)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AverageExpenseOnroad)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AverageExpenseOnroad)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AverageExpenseCombined)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AverageExpenseCombined)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.YearOfManufacure)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.YearOfManufacure)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Doors)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Doors)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TypeCompartment)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TypeCompartment)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OriginalPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OriginalPrice)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PictureUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PictureUrl)
-        </dd>
-    </dl>
-</div>
-<div id="player"></div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.CarId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
-
-<script>(function() {
-  var tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api?key=AIzaSyBe2L50eqwOmkrqZFe9wqYkqOoOwEJpPgY';
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-})();
-
-// Create an <iframe> (YouTube Player) after the API code downloads
-var player;
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    height: '360',
-    width: '640',
-    videoId: 'X3cVttIXmOs', // Replace with the YouTube video ID
-  });
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
-</script>
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
+<body>
+	<div class="containerCreateCar">
+		<h2>Детайли</h2>
+		
+			
+				<h4>Главна информация</h4>
+				<hr />
+				<img src="@Model.PictureUrl" class="picture" >
+				<dl class="row">
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.Model)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.Model)
+			</dd>
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.Hp)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.Hp)
+			</dd>
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.MaxSpeed)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.MaxSpeed)
+			</dd>
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.MinSpeed)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.MinSpeed)
+			</dd>
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.TypeFuel)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.TypeFuel)
+			</dd>
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.Capacity)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.Capacity)
+			</dd>
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.TypeEngine)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.TypeEngine)
+			</dd>
+			<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.NumberOfSeats)
+			</dt>
+			<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.NumberOfSeats)
+			</dd>
+			</dl>
+	
+	
+		<h4>Допълнителна информация</h4>
+                    <hr />
+		<dl class="row">
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.Height)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.Height)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.Weight)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.Weight)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.AverageExpenseTown)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.AverageExpenseTown)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.AverageExpenseOnroad)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.AverageExpenseOnroad)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.AverageExpenseCombined)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.AverageExpenseCombined)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.YearOfManufacure)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.YearOfManufacure)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.Doors)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.Doors)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.TypeCompartment)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.TypeCompartment)
+		</dd>
+		<dt class="col-sm-2">
+					@Html.DisplayNameFor(model => model.OriginalPrice)
+		</dt>
+		<dd class="col-sm-10">
+					@Html.DisplayFor(model => model.OriginalPrice)
+		</dd>
+		
+		</dl>
+	
+	
+	
+	<div>
+			@if (User.Identity.IsAuthenticated)
+			{
+				<a href="@Url.Action("Edit", new { id = Model?.CarId })" class="btnDDE">Промени</a>
+				<a href="@Url.Action("Delete", new { id = Model?.CarId })" class="btnDelete">Изтрий</a>
+			}
+			
+				<a href="@Url.Action("Index", "Car")" class="btnBackToMain">Към списък с коли</a>
+			
+			
+		
+	</div>
+	</div>
+</body>

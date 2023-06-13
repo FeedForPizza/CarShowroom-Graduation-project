@@ -4,11 +4,20 @@
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
+<body>
+    <div class="containerCreateCar">
 
-<h1>Details</h1>
+<h2>Детайли</h2>
 
 <div>
-    <h4>TestDrive</h4>
+    <h4>Тест драйв</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -16,12 +25,6 @@
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.DateOfTestDrive)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateOfQuery)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateOfQuery)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Car.Model)
@@ -62,6 +65,19 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.TestDriveId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if(User.Identity.IsAuthenticated)
+    {
+<a href="@Url.Action("Edit", new { id = Model?.TestDriveId })" class="btnDDE">Промяна</a> 
+<a href="@Url.Action("Delete", new { id = Model?.TestDriveId })" class="btnDelete">Изтрий</a>
+                <a href="@Url.Action("Index", "TestDrive")"  class="btnBackToMain">Към списък с тест драйв</a>
+            }
+            else
+            {
+                <a href="@Url.Action("Index", "Home")"  class="btnBackToMain">Към началната страница</a>
+            }
+            
+    
 </div>
+
+</div>
+</body>

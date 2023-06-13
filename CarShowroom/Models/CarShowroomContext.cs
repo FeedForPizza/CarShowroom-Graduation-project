@@ -47,7 +47,7 @@ public partial class CarShowroomContext : DbContext
 
             entity.Property(e => e.CarId)
                 .ValueGeneratedNever()
-                .HasColumnName("CarID");
+                .HasColumnName("CarID").ValueGeneratedOnAdd();
             entity.Property(e => e.AverageExpenseCombined)
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("AverageExpenseCOMBINED");
@@ -69,6 +69,10 @@ public partial class CarShowroomContext : DbContext
             entity.Property(e => e.TypeFuel).HasColumnType("text");
             entity.Property(e => e.Weight).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.YearOfManufacure).HasColumnType("datetime");
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
         });
 
         modelBuilder.Entity<CarExtra>(entity =>
@@ -91,6 +95,10 @@ public partial class CarShowroomContext : DbContext
                 .HasForeignKey(d => d.ExtraId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CarExtra_Extra");
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
         });
 
         modelBuilder.Entity<Customer>(entity =>
@@ -103,6 +111,10 @@ public partial class CarShowroomContext : DbContext
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.MiddleName).HasMaxLength(50);
             entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
         });
 
         modelBuilder.Entity<Extra>(entity =>
@@ -115,9 +127,13 @@ public partial class CarShowroomContext : DbContext
 
             entity.Property(e => e.ExtraId)
                 .ValueGeneratedNever()
-                .HasColumnName("ExtraID");
+                .HasColumnName("ExtraID").ValueGeneratedOnAdd(); 
             entity.Property(e => e.ExtraName).HasColumnType("text");
             entity.Property(e => e.Price).HasColumnType("money");
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
         });
 
         modelBuilder.Entity<Order>(entity =>
@@ -134,6 +150,10 @@ public partial class CarShowroomContext : DbContext
             entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
             entity.Property(e => e.OriginalPrice).HasColumnType("money");
             entity.Property(e => e.TotalSum).HasColumnType("money");
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
 
             entity.HasOne(d => d.Car).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.CarId)
@@ -164,6 +184,10 @@ public partial class CarShowroomContext : DbContext
                 .HasForeignKey(d => d.ExtraId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_CarExtra_Extra");
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
         });
 
         modelBuilder.Entity<Storage>(entity =>
@@ -174,10 +198,22 @@ public partial class CarShowroomContext : DbContext
 
             entity.ToTable("Storage", "19118133");
 
+            entity.HasIndex(e => e.CarId, "Relationship_3_FK");
+
             entity.Property(e => e.StorageId)
                 .ValueGeneratedNever()
                 .HasColumnName("StorageID");
             entity.Property(e => e.YearOfManufacture).HasColumnType("datetime");
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
+            entity.Property(e => e.CarId).HasColumnName("CarID");
+
+            entity.HasOne(d => d.Car).WithMany(p => p.Storages)
+                .HasForeignKey(d => d.CarId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Storage_Car");
         });
 
         modelBuilder.Entity<TestDrive>(entity =>
@@ -197,6 +233,11 @@ public partial class CarShowroomContext : DbContext
             entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
             entity.Property(e => e.DateOfQuery).HasColumnType("datetime");
             entity.Property(e => e.DateOfTestDrive).HasColumnType("datetime");
+            entity.Property(e => e.Modified19118133)
+        .HasColumnName("Modified19118133")
+        .HasColumnType("datetime") // Specify the appropriate data type for your database
+        .IsRequired();
+
 
             entity.HasOne(d => d.Car).WithMany(p => p.TestDrives)
                 .HasForeignKey(d => d.CarId)

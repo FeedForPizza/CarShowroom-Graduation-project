@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/CarShowroom.styles.css" asp-append-version="true" />
 	<style>
-		
+
 
 		.btn {
 			background-color: transparent;
@@ -23,7 +23,7 @@
 		}
 	</style>
 	@RenderSection("styles",false)
-	
+
 </head>
 <body>
 	<!-- Navbar -->
@@ -31,7 +31,7 @@
 		<!-- Container wrapper -->
 		<div class="container">
 			<!-- Navbar brand -->
-			<a class="navbar-brand" href="#">NISSAN</a>
+			<a class="navbar-brand" asp-controller="Home" asp-action="Index">NISSAN</a>
 
 			<!-- Toggle button -->
 			<button class="navbar-toggler"
@@ -52,12 +52,37 @@
 					<li class="nav-item">
 						<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Car" asp-action="Index">КОЛИ</a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="TestDrive" asp-action="Create">ТЕСТ ДРАЙВ</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Order" asp-action="Create">ПОРЪЧКА</a>
-					</li>
+					@if (User.Identity.IsAuthenticated)
+					{
+						<li class="nav-item">
+							<a class="nav-link text-light" style="font-size: 17px" asp-area="" asp-controller="TestDrive" asp-action="Index">ТЕСТ ДРАЙВ</a>
+						</li>
+					}
+					else
+					{
+						<li class="nav-item">
+							<a class="nav-link text-light" style="font-size: 17px" asp-area="" asp-controller="TestDrive" asp-action="Create">ТЕСТ ДРАЙВ</a>
+						</li>
+					}
+					@if (User.Identity.IsAuthenticated)
+					{
+						<li class="nav-item">
+							<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Order" asp-action="Index">ПОРЪЧКА</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Extra" asp-action="Index">ЕКСТРИ</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Storage" asp-action="Index">СКЛАД</a>
+						</li>
+					}
+					else
+					{
+						<li class="nav-item">
+							<a class="nav-link text-light" style="font-size:17px" asp-area="" asp-controller="Order" asp-action="Create">ПОРЪЧКА</a>
+						</li>
+					}
+
 
 				</ul>
 				<!--<div class="d-flex ms-auto order-5">
@@ -75,7 +100,7 @@
 				<!-- Left links -->
 			</div>
 			<div class="navbar-collapse collapse d-sm inline-flex flex-sm-row-reverse">
-				<partial name="_LoginPartial.cshtml"/>
+				<partial name="_LoginPartial.cshtml" />
 			</div>
 			<!-- Collapsible wrapper -->
 		</div>
@@ -97,6 +122,6 @@
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
-	
+
 </body>
 </html>

@@ -1,24 +1,30 @@
-﻿@model IEnumerable<CarShowroom.Entities.CarExtra>
+﻿@model IEnumerable<CarShowroom.Entities.OrderExtra>
 
 @{
     ViewData["Title"] = "IndexCarExtra";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
+<body>
+    <div class="containerCreateCar">
+<h2>Поръчки с екстри към тях</h2>
 
-<h1>IndexCarExtra</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Car)
+                @Html.DisplayNameFor(model => model.Order)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Extra)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Extra.ExtraName)
+            </th>
+            
             <th></th>
         </tr>
     </thead>
@@ -26,17 +32,19 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Car.CarId)
+                @Html.DisplayFor(modelItem => item.OrderId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Extra.ExtraId)
+                @Html.DisplayFor(modelItem => item.ExtraId)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CarExtraId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CarExtraId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CarExtraId">Delete</a>
+                @Html.DisplayFor(modelItem => item.Extra.ExtraName)
             </td>
+            
         </tr>
 }
     </tbody>
 </table>
+<a href="@Url.Action("Index", "Order")"  class="btnBackToMain">Назад</a>
+</div>
+</body>

@@ -7,6 +7,7 @@ using System.Configuration;
 using AutoMapper;
 using CarShowroom.Models;
 using Microsoft.AspNetCore.Identity;
+using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
 StripeConfiguration.ApiKey = "sk_test_51MqzY8CQrFM3nxZSX49ZJeh8eGLzMbvyHf6N5ClJA8JqvyTEBNr2Hv7zFQHZIZrfkChtKV7rz0zUgO2XDUrw3TtW00jayPvczV";// Add services to the container.
@@ -14,6 +15,7 @@ StripeConfiguration.ApiKey = "sk_test_51MqzY8CQrFM3nxZSX49ZJeh8eGLzMbvyHf6N5ClJA
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -31,7 +33,7 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 });
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<UserDbContext>();
-builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

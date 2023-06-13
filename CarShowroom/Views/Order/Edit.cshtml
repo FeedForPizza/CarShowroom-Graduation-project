@@ -4,76 +4,88 @@
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<head>
+    <link rel="stylesheet" href="/css/PagesStyle.css">
+</head>
+<body>
+    <div class="containerCreateCar">
+<h2>Редактиране</h2>
 
-<h1>Edit</h1>
-
-<h4>Order</h4>
+<h4>Поръчка</h4>
 <hr />
 <div class="row">
     <div class="column">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="OrderId" />
-            <div class="form-group">
-                <label asp-for="OriginalPrice" class="control-label"></label>
-                <input asp-for="OriginalPrice" class="form-control" />
-                <span asp-validation-for="OriginalPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TotalSum" class="control-label"></label>
-                <input asp-for="TotalSum" class="form-control" />
-                <span asp-validation-for="TotalSum" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Quantity" class="control-label"></label>
-                <input asp-for="Quantity" class="form-control" />
-                <span asp-validation-for="Quantity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                @Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Select Model", new{@class = "form-control", id = "Car",name ="selectedCarId"})
-            </div>
-        </form>
-    </div></div>
-    <div class="column">
-         <form>
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Customer.FirstName" class="control-label"></label>
-                <input asp-for="Customer.FirstName" class="form-control" />
-                <span asp-validation-for="Customer.FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.MiddleName" class="control-label"></label>
-                <input asp-for="Customer.MiddleName" class="form-control" />
-                <span asp-validation-for="Customer.MiddleName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.LastName" class="control-label"></label>
-                <input asp-for="Customer.LastName" class="form-control" />
-                <span asp-validation-for="Customer.LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.Address" class="control-label"></label>
-                <input asp-for="Customer.Address" class="form-control" />
-                <span asp-validation-for="Customer.Address" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Customer.Phone" class="control-label"></label>
-                <input asp-for="Customer.Phone" class="form-control" />
-                <span asp-validation-for="Customer.Phone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="OrderId" />
+                <div class="form-group">
+                    <label asp-for="OriginalPrice" class="control-label"></label>
+                    <input asp-for="OriginalPrice" class="form-control" readonly />
+                    <span asp-validation-for="OriginalPrice" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TotalSum" class="control-label"></label>
+                    <input asp-for="TotalSum" class="form-control" />
+                    <span asp-validation-for="TotalSum" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Quantity" class="control-label"></label>
+                    <input asp-for="Quantity" class="form-control" readonly />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CarId" class="control-label"> Модел кола: </label>
+					@Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Моля изберете кола", new{@class = "form-control",name ="selectedCarId"})
+                     
+                </div>
+                <div class="form-group">
+                    <label asp-for="Customer.FirstName" class="control-label"></label>
+                    <input asp-for="Customer.FirstName" class="form-control" />
+                    <span asp-validation-for="Customer.FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Customer.MiddleName" class="control-label"></label>
+                    <input asp-for="Customer.MiddleName" class="form-control" />
+                    <span asp-validation-for="Customer.MiddleName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Customer.LastName" class="control-label"></label>
+                    <input asp-for="Customer.LastName" class="form-control" />
+                    <span asp-validation-for="Customer.LastName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Customer.Address" class="control-label"></label>
+                    <input asp-for="Customer.Address" class="form-control" />
+                    <span asp-validation-for="Customer.Address" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Customer.Phone" class="control-label"></label>
+                    <input asp-for="Customer.Phone" class="form-control" />
+                    <span asp-validation-for="Customer.Phone" class="text-danger"></span>
+                </div>
+                <br>
+                <div class="button-container">
+                <div class="form-group">
+                    <input type="submit" value="Запази" class="btn" />
+                </div>
+                
+    <a href="@Url.Action("Index", "Order")"  class="btnBackToMain">Към списъка с поръчки</a>
+</div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+</div>
+</body>

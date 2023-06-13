@@ -1,64 +1,315 @@
 ﻿@model IEnumerable<CarShowroom.Entities.Order>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+	body {
+		background-color: rgba(45, 89, 134, 0.8);
+	}
 
-<h1>Index</h1>
+	h2 {
+		text-align: center;
+	}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.OrderId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OriginalPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalSum)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Car)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Customer)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrderId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OriginalPrice)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalSum)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CarId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerId)
-            </td>
-            <td>
-            <a asp-action="Edit" asp-route-id="@item.OrderId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.OrderId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a>
-        </td>
-        </tr>
-}
-    </tbody>
-</table>
+	.containerCreateCar {
+		background-color: white;
+		border-radius: 20px;
+		padding: 20px;
+	}
 
+	.left-column {
+		flex: 1;
+		padding-right: 20px;
+	}
+
+	.column {
+		flex: 1;
+		padding: 0 10px;
+	}
+
+	.right-column {
+		flex: 1;
+		padding-left: 20px;
+	}
+
+	.btnDelete {
+		display: inline-block;
+		padding: 5px 20px;
+		background-color: rgb(204, 0, 0);
+		color: white;
+		text-decoration: none;
+		border-radius: 10px;
+		transition: background-color 0.3s ease;
+	}
+
+	.btnBackToMain {
+		display: inline-block;
+		padding: 5px 20px;
+		background-color: rgba(45, 89, 134, 0.9);
+		color: white;
+		text-decoration: none;
+		border-radius: 10px;
+		transition: background-color 0.3s ease;
+	}
+
+		.btnBackToMain:hover {
+			background-color: rgb(198, 217, 236);
+			color: #404040;
+		}
+
+	.btnDelete:hover {
+		background-color: rgb(204, 0, 0,0.3);
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 5px 20px;
+		background-color: rgba(45, 89, 134, 0.9);
+		color: white;
+		text-decoration: none;
+		border-radius: 30px;
+		transition: background-color 0.3s ease;
+	}
+
+	.btnDDE {
+		display: inline-block;
+		padding: 5px 20px;
+		background-color: rgba(45, 89, 134, 0.9);
+		color: white;
+		text-decoration: none;
+		border-radius: 10px;
+		transition: background-color 0.3s ease;
+	}
+
+		.btnDDE:hover {
+			background-color: rgb(198, 217, 236);
+			color: #404040;
+		}
+
+	.btn:hover {
+		background-color: rgb(198, 217, 236);
+		color: #404040;
+	}
+
+	.button-container {
+		display: flex;
+		gap: 5px;
+	}
+
+	.picture {
+		float: right;
+		max-width: 100%;
+		width: 450px; /* Adjust the width as needed */
+		height: auto;
+	}
+</style>
+<body>
+	<div class="containerCreateCar">
+		<h2>Поръчки</h2>
+
+		<div>
+			<label class="control-label"> Модел кола: </label>
+			@Html.DropDownList("CarId",ViewBag.CustomerOptions as SelectList,"Моля изберете кола", new{@class = "form-control",id = "carId"})
+		</div>
+		<div>
+			<label for="sortOrder">Начин на сортиране:</label>
+			<select name="sortOrder" id="sortOrder">
+				<option value="">-- Моля изберете начин на сортиране --</option>
+
+				<option value="total_sum_asc">Обща сума (Възходящ)</option>
+				<option value="total_sum_desc">Обща сума (Низходящ)</option>
+			</select>
+		</div>
+		<div class="button-container">
+			<div>
+				<button type="submit" class="btn" id="searchButton">Търси</button>
+			</div>
+			<div>
+				<button type="submit" class="btn" id="generateReportButton">Създай справка</button>
+			</div>
+			
+
+
+			<div class="button-container">
+				<a href="@Url.Action("IndexCarExtra", "Extra")" class="btn">Поръчки с екстри</a>
+
+			</div>
+			<div>
+				<button type="submit" class="btn" id="clearSearch">Изчисти</button>
+			</div>
+		</div>
+		<table class="table" id="orderReportTable">
+			<thead>
+				<tr>
+					<th>
+						@Html.DisplayNameFor(model => model.OrderId)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.OriginalPrice)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.TotalSum)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.Quantity)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.Car)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.Car.Model)
+					</th>
+					<th>
+						@Html.DisplayNameFor(model => model.Customer)
+					</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr>
+						<td>
+							@Html.DisplayFor(modelItem => item.OrderId)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => item.OriginalPrice)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => item.TotalSum)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => item.Quantity)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => item.CarId)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => item.Car.Model)
+						</td>
+						<td>
+							@Html.DisplayFor(modelItem => item.CustomerId)
+						</td>
+						<td>
+							<div class="button-container">
+								<a href="@Url.Action("Edit", new { id = item.OrderId })" class="btnDDE">Промени</a>
+								<a href="@Url.Action("Details", new { id = item.OrderId })" class="btnDDE">Детайли</a>
+								<a href="@Url.Action("Delete", new { id = item.OrderId })" class="btnDelete">Изтрий</a>
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+			$(document).ready(function () {
+				$('#searchButton').click(function (event) {
+					event.preventDefault(); // Prevent the default button click behavior
+
+					// Make an AJAX request to generate the report
+					$.ajax({
+						url: "/Order/GenerateOrderReport",
+						type: "GET",
+						data: {
+							carModel: $("#carId").val(),
+							sortOrder: $("#sortOrder").val()
+						},
+						dataType: "json",
+						success: function (report) {
+
+updateTableWithReport(report);
+							
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				});
+			});
+			$("#clearSearch").click(function() {
+				 $("#carId").val("");
+				 $("#sortOrder").val("");
+				 $("#orderReportTable tbody").empty();
+					$.ajax({
+						url: "/Order/GenerateOrderReport",
+						type: "GET",
+						dataType: "json",
+						success: function (report) {
+						$("#orderReportTable tbody").empty();
+
+							updateTableWithReport(report);
+							
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				});
+			
+
+
+			$("#generateReportButton").click(function () {
+
+					$.ajax({
+						url: "/Order/GenerateOrderReport",
+						type: "GET",
+						data: {
+							carModel: $("#carId").val(),
+							sortOrder: $("#sortOrder").val()
+						},
+						dataType: "json",
+						success: function (report) {
+
+							exportToXml(report);
+
+						},
+						error: function (error) {
+							console.log(error);
+						}
+					});
+				});
+		function exportToXml(report) {
+		  // Convert the report data to a query parameter string
+		  var queryParams = "report=" + encodeURIComponent(JSON.stringify(report));
+
+		  // Construct the URL with the query parameter
+		  var url = "/Order/ExportToXml?" + queryParams;
+
+		  // Navigate to the URL
+		  window.location.href = url;
+		}
+
+
+
+			function updateTableWithReport(report) {
+				// Clear the table body
+				$("#orderReportTable tbody").empty();
+
+				// Add the rows from the report to the table
+				$.each(report, function (index, item) {
+					var row = $("<tr>");
+					row.append($("<td>").text(item.orderId));
+					row.append($("<td>").text(item.originalPrice));
+					row.append($("<td>").text(item.totalSum));
+					row.append($("<td>").text(item.quantity));
+					row.append($("<td>").text(item.carId));
+					row.append($("<td>").text(item.model));
+					row.append($("<td>").text(item.customerId));
+					var actions = $('<td>');
+					var buttonContainer = '<div class="button-container">' +
+    '<a href="/Order/Edit/' + item.orderId + '" class="btnDDE">Промени</a>' +
+    '<a href="/Order/Details/' + item.orderId + '" class="btnDDE">Детайли</a>' +
+    '<a href="/Order/Delete/' + item.orderId + '" class="btnDelete">Изтрий</a>' +
+    '</div>';
+
+actions.append(buttonContainer);
+				row.append(actions);
+					$("#orderReportTable tbody").append(row);
+				});
+			}
+	</script>
+</body>
