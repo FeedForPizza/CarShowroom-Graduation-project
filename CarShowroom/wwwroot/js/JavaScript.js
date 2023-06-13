@@ -1,6 +1,6 @@
 ﻿
 // This is your test publishable API key.
-const stripe = Stripe("pk_test_51MqzY8CQrFM3nxZSj99k1cv9UCGrwlvaPwWODG6mUnbCf08jLaIKb2rfTlk6i6Gkr9KeumwcWVUVidNbN8B38gsW00CLrnShHg");
+const stripe = Stripe("publicKey");
 
 // The items the customer wants to buy
 

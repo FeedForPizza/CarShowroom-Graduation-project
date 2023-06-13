@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using OfficeOpenXml;
 
 var builder = WebApplication.CreateBuilder(args);
-StripeConfiguration.ApiKey = "sk_test_51MqzY8CQrFM3nxZSX49ZJeh8eGLzMbvyHf6N5ClJA8JqvyTEBNr2Hv7zFQHZIZrfkChtKV7rz0zUgO2XDUrw3TtW00jayPvczV";// Add services to the container.
+StripeConfiguration.ApiKey = "secretkey";// Add services to the container.
 
 
 builder.Services.AddControllersWithViews();

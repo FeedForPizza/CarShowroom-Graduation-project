@@ -248,7 +248,7 @@ namespace CarShowroom.Controllers
             // Process the payment and perform any necessary operations
 
             // Send confirmation email using SendGrid
-            var apiKey = "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";
+            var apiKey = "apiKey";
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("krisito_dt@abv.bg", "Krisi");
             var subject = "Payment Confirmation";
